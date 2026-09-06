@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="de.mkysarte.bewerbungsmanager.ui.screen.DashboardController"
+            stylesheets="@../styles/app.css"
+            styleClass="dashboard-root">
+
+    <!-- ===== Topbar ===== -->
+    <top>
+        <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="0">
+            <Label text="Bewerbungsmanager" styleClass="brand-name"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox styleClass="topbar-actions" alignment="CENTER_RIGHT" spacing="8">
+                <Button fx:id="themeToggleBtn" styleClass="icon-btn"
+                        onAction="#handleToggleTheme">
+                    <graphic><FontIcon fx:id="themeIcon" iconLiteral="far-moon" iconSize="16"/></graphic>
+                </Button>
+                <Label fx:id="usernameLabel" styleClass="topbar-username"/>
+                <Button text="Einstellungen" styleClass="ghost-btn"
+                        onAction="#handleOpenSettings"/>
+                <Button fx:id="createUserButton" text="Eigenes Konto einrichten" styleClass="ghost-btn"
+                        onAction="#handleCreateUser"/>
+                <Button fx:id="resetDataButton" text="Eigenes Konto löschen" styleClass="ghost-btn"
+                        onAction="#handleResetData"/>
+                <Button text="Abmelden" styleClass="link-btn"
+                        onAction="#handleLogout"/>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- ===== Hauptinhalt ===== -->
+ <center>
+        <StackPane>
+            <StackPane styleClass="page-shell">
+            <VBox styleClass="dashboard-main" spacing="0" maxWidth="1.7976931348623157E308">
+
+                <!-- Begrüßung -->
+                <VBox styleClass="headline-block">
+                    <Label fx:id="welcomeLabel" text="Willkommen zurück!"
+                           styleClass="headline-title"/>
+                    <Label text="Verwalten Sie Ihre Bewerbungen effizient und behalten Sie den Überblick."
+                           styleClass="headline-sub"/>
+                </VBox>
+
+                <!-- Unterlagen-Sektion -->
+                <VBox styleClass="documents-panel">
+                    <VBox styleClass="section-card documents-section-card" spacing="16">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="Meine Unterlagen" styleClass="documents-panel-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="exportMarkdownButton" text="Als Markdown exportieren" styleClass="ghost-btn" onAction="#handleExportMarkdown"/>
+                            <Button fx:id="openDocumentsButton" text="Dokumentenansicht" styleClass="ghost-btn" onAction="#handleOpenDocuments"/>
+                        </HBox>
+                        <HBox fx:id="documentsGrid" styleClass="documents-upload-grid" spacing="14">
+                            <!-- wird dynamisch befüllt -->
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Statistik-Kacheln -->
+                <HBox fx:id="statsGrid" styleClass="stats-section" spacing="12">
+                    <!-- wird dynamisch befüllt -->
+                </HBox>
+
+                <!-- Toolbar: Suche + Aktionen -->
+                <HBox styleClass="toolbar" spacing="12" alignment="CENTER_LEFT">
+                    <HBox styleClass="search-wrap" alignment="CENTER_LEFT" spacing="8" HBox.hgrow="ALWAYS">
+                        <FontIcon iconLiteral="fas-search" iconSize="14" styleClass="search-icon-node"/>
+                        <TextField fx:id="searchField"
+                                   promptText="Unternehmen, Position oder Kontaktperson suchen..."
+                                   styleClass="search-input"
+                                   HBox.hgrow="ALWAYS"
+                                   onKeyReleased="#handleSearch"/>
+                    </HBox>
+                    <HBox styleClass="toolbar-actions" spacing="8">
+                        <Button fx:id="newApplicationButton" text="+ Neue Bewerbung" styleClass="btn-primary"
+                                onAction="#handleNewApplication"/>
+                    </HBox>
+                </HBox>
+
+                <!-- Ergebnis-Info -->
+                <Label fx:id="statusBarLabel" text=""
+                       styleClass="status-bar-label"
+                       style="-fx-padding: 0 24 4 24;"/>
+
+                <!-- Bewerbungsliste -->
+                <VBox styleClass="applications-section" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="applicationList" styleClass="applications-list"
+                              VBox.vgrow="ALWAYS"
+                              onMouseClicked="#handleApplicationClick"/>
+                </VBox>
+
+                <!-- Leer-Zustand -->
+                <VBox fx:id="emptyState" styleClass="empty-panel" alignment="CENTER"
+                      spacing="12" visible="false" managed="false">
+                    <FontIcon iconLiteral="fas-briefcase" iconSize="48" styleClass="empty-icon"/>
+                    <Label text="Keine Bewerbungen vorhanden" styleClass="empty-title"/>
+                    <Label text="Klicke auf '+ Neue Bewerbung', um zu starten."
+                           styleClass="empty-subtitle"/>
+                    <Button text="+ Erste Bewerbung anlegen" styleClass="btn-primary"
+                            onAction="#handleNewApplication"/>
+                </VBox>
+
+            </VBox>
+            </StackPane>
+            <StackPane fx:id="formOverlay" visible="false" managed="false" styleClass="screen-overlay">
+                <VBox fx:id="overlayShell" maxWidth="1.7976931348623157E308" styleClass="overlay-shell">
+                    <HBox alignment="CENTER_RIGHT" styleClass="overlay-header-actions">
+                        <Button fx:id="overlayCloseButton" text="Schließen" styleClass="ghost-btn" onAction="#handleCloseOverlay"/>
+                    </HBox>
+                    <StackPane fx:id="formOverlayContent" styleClass="overlay-content" VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </StackPane>
+            <StackPane fx:id="confirmOverlay" visible="false" managed="false" styleClass="screen-overlay confirm-screen-overlay">
+                <VBox fx:id="confirmOverlayShell" styleClass="overlay-shell overlay-shell-compact confirm-overlay-shell">
+                    <StackPane fx:id="confirmOverlayContent" styleClass="confirm-overlay-content"/>
+                </VBox>
+            </StackPane>
+            <StackPane fx:id="previewOverlay" visible="false" managed="false" styleClass="screen-overlay preview-screen-overlay">
+                <VBox fx:id="previewOverlayShell" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" styleClass="overlay-shell preview-overlay-shell">
+                    <HBox alignment="CENTER_LEFT" styleClass="preview-topbar" spacing="14">
+                        <VBox spacing="2" alignment="CENTER_LEFT">
+                            <Label text="Dokumentenvorschau" styleClass="preview-heading"/>
+                            <Label fx:id="previewTitleLabel" text="PDF-Vorschau" styleClass="preview-file-label"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <HBox alignment="CENTER_LEFT" styleClass="preview-toolbar" spacing="10">
+                            <Button styleClass="ghost-btn preview-icon-btn" onAction="#handlePreviewZoomOut">
+                                <graphic><FontIcon iconLiteral="fas-minus" iconSize="12"/></graphic>
+                            </Button>
+                            <Label fx:id="previewZoomLabel" text="100%" styleClass="preview-toolbar-label"/>
+                            <Button styleClass="ghost-btn preview-icon-btn" onAction="#handlePreviewZoomIn">
+                                <graphic><FontIcon iconLiteral="fas-plus" iconSize="12"/></graphic>
+                            </Button>
+                            <Button text="Zoom Out" styleClass="ghost-btn" onAction="#handlePreviewFitPage"/>
+                            <Button text="Zoom" styleClass="ghost-btn" onAction="#handlePreviewFitWidth"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="previewPreviousButton" text="Zurück" styleClass="ghost-btn" onAction="#handlePreviewPreviousPage"/>
+                            <Label fx:id="previewPageLabel" text="Seite 0 / 0" styleClass="preview-toolbar-label"/>
+                            <Button fx:id="previewNextButton" text="Weiter" styleClass="ghost-btn" onAction="#handlePreviewNextPage"/>
+                            <Button text="Schließen" styleClass="ghost-btn" onAction="#handleClosePreviewOverlay"/>
+                        </HBox>
+                    </HBox>
+                    <ScrollPane fx:id="previewScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="preview-scroll" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="previewPagesBox" styleClass="preview-pages-box" spacing="18" alignment="TOP_CENTER"/>
+                    </ScrollPane>
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+
+</BorderPane>

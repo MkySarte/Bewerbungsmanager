@@ -1,0 +1,69 @@
+# ===== Maven / Java =====
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.log
+
+# ===== Nutzerdaten - duerfen NIEMALS ins Repo =====
+# Im Betrieb liegen diese Dateien unter ~/.bewerbungsmanager/, also ausserhalb des
+# Projekts. Die Eintraege sind Vorsorge fuer den Fall, dass jemand eine Datenbank
+# zum Nachsehen ins Projekt kopiert: data.db enthaelt die echten Bewerbungen,
+# keys.properties den verpackten Datenbankschluessel.
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+keys.properties
+fenster.properties
+
+# ===== Schluessel und Zertifikate =====
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+
+# ===== Umgebung / Geheimnisse =====
+.env
+.env.*
+!.env.example
+
+# ===== IDEs =====
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+.classpath
+.project
+.settings/
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+# ===== Gradle (falls je gebraucht) =====
+build/
+.gradle/
+
+# ===== Betriebssystem =====
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# ===== Sonstiges =====
+*.swp
+*~
+HELP.md

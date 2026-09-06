@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../styles/app.css"
+            styleClass="login-root">
+
+    <!-- Topbar -->
+    <top>
+        <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="8">
+            <Label text="Bewerbungsmanager" styleClass="brand-name"/>
+        </HBox>
+    </top>
+
+    <!-- Auth-Card zentriert -->
+    <center>
+        <StackPane alignment="CENTER">
+            <VBox styleClass="auth-card" spacing="12" alignment="TOP_LEFT"
+                  maxWidth="400">
+
+                <Label text="Anmelden" styleClass="auth-title"/>
+                <Label text="Melde dich an, um auf dein Dashboard zuzugreifen."
+                       styleClass="auth-subtitle" wrapText="true"/>
+
+                <Region minHeight="8"/>
+
+                <!-- Felder -->
+                <Label text="Benutzername" styleClass="form-label"/>
+                <TextField fx:id="usernameField"
+                           promptText="Benutzername"
+                           styleClass="form-input"
+                           maxWidth="Infinity"
+                           onAction="#handleLogin"/>
+
+                <Label text="Passwort" styleClass="form-label"/>
+                <PasswordField fx:id="passwordField"
+                               promptText="......."
+                               styleClass="form-input"
+                               maxWidth="Infinity"
+                               onAction="#handleLogin"/>
+
+                <!-- Fehlermeldung -->
+                <Label fx:id="errorLabel" styleClass="error-label"
+                       wrapText="true" maxWidth="Infinity"
+                       visible="false" managed="false"/>
+
+                <Region minHeight="4"/>
+
+                <!-- Anmelde-Button -->
+                <Button fx:id="loginButton" text="Anmelden"
+                        styleClass="btn-primary"
+                        maxWidth="Infinity"
+                        onAction="#handleLogin"/>
+
+                <Hyperlink text="Passwort vergessen?" styleClass="auth-link"
+                           onAction="#handleForgotPassword"/>
+
+                <Region minHeight="4"/>
+
+                <!-- Dauerhaft sichtbar: der Initial-Zugang ist Demo und letzter Ausweg
+                     zugleich. Er darf nie in Vergessenheit geraten. -->
+                <VBox styleClass="initial-access-box" spacing="4">
+                    <Label text="Demo- und Notfallzugang" styleClass="initial-access-title"/>
+                    <Label fx:id="initialAccessLabel" styleClass="initial-access-credentials"/>
+                    <Label text="Zum Ausprobieren mit Musterdaten - und der Weg zurück in die App, falls Passwort und Masterpasswort verloren gehen. Die echten Bewerbungsdaten sind darüber nicht erreichbar."
+                           styleClass="initial-access-hint" wrapText="true"/>
+                </VBox>
+
+            </VBox>
+
+            <StackPane fx:id="forgotOverlay" visible="false" managed="false" styleClass="screen-overlay">
+                <VBox fx:id="forgotOverlayShell" styleClass="overlay-shell overlay-shell-compact">
+                    <HBox alignment="CENTER_RIGHT" styleClass="overlay-header-actions">
+                        <Button text="Schließen" styleClass="ghost-btn" onAction="#handleCloseForgotPassword"/>
+                    </HBox>
+                    <VBox styleClass="admin-overlay-panel" spacing="12">
+                        <Label text="Passwort mit Masterpasswort zurücksetzen" styleClass="overlay-title"/>
+                        <Label text="Geben Sie das Masterpasswort aus Ihrer PDF und ein neues Passwort ein." styleClass="overlay-subtitle" wrapText="true"/>
+
+                        <Label text="Masterpasswort" styleClass="form-label"/>
+                        <TextField fx:id="masterPasswordField" promptText="Masterpasswort" styleClass="form-input"/>
+
+                        <Label text="Neues Passwort" styleClass="form-label"/>
+                        <PasswordField fx:id="newPasswordField" promptText="Neues Passwort" styleClass="form-input"/>
+
+                        <Label fx:id="forgotErrorLabel" styleClass="error-label" wrapText="true" visible="false" managed="false"/>
+
+                        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="admin-overlay-actions">
+                            <Button text="Abbrechen" styleClass="ghost-btn" onAction="#handleCloseForgotPassword"/>
+                            <Button fx:id="forgotSubmitButton" text="Passwort zurücksetzen" styleClass="btn-primary" onAction="#handleSubmitForgotPassword"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+
+</BorderPane>

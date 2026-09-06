@@ -1,0 +1,39 @@
+name: Tests
+
+# Läuft bei jedem Push und jedem Pull Request. Bewusst nur auf Linux: Der Code ist
+# plattformunabhängig, und ein Läufer kostet ein Zehntel eines macOS-Läufers.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Bauen und testen
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 21 einrichten
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Der Läufer hat keinen Bildschirm. Die Tests kommen damit zurecht, aber AWT
+      # muss es wissen - sonst versucht PDFBox eine Grafikumgebung zu öffnen.
+      - name: Tests
+        run: ./mvnw -B test -Djava.awt.headless=true
+
+      # Auch bei roten Tests hochladen - sonst sieht man nur "fehlgeschlagen"
+      # und muss raten, welcher Fall es war.
+      - name: Testberichte sichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testberichte
+          path: target/surefire-reports/
+          retention-days: 7

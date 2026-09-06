@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="de.mkysarte.bewerbungsmanager.ui.screen.DocumentsController"
+           stylesheets="@../styles/app.css"
+           styleClass="documents-root">
+
+    <BorderPane>
+
+    <top>
+        <HBox styleClass="topbar" alignment="CENTER_LEFT" spacing="0">
+            <Button text="← Dashboard" styleClass="link-btn" onAction="#handleBack"/>
+            <Label text="Dokumente" styleClass="brand-name">
+                <HBox.margin><Insets left="8"/></HBox.margin>
+            </Label>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="main-scroll">
+            <VBox styleClass="documents-page" spacing="20">
+                <VBox styleClass="headline-block documents-page-headline">
+                    <Label text="Dokumentenverwaltung" styleClass="headline-title"/>
+                    <Label text="Verwalten Sie Ihre globalen Unterlagen zentral für alle Bewerbungen." styleClass="headline-sub"/>
+                </VBox>
+
+                <VBox styleClass="documents-page-card" spacing="18">
+                    <HBox styleClass="documents-toolbar" alignment="CENTER_LEFT" spacing="12">
+                        <VBox spacing="4">
+                            <Label text="Filter" styleClass="documents-filter-title"/>
+                            <Label text="Typ und Scope eingrenzen oder neue PDF-Dateien hochladen." styleClass="documents-filter-subtitle"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="documents-filter-group">
+                            <Label text="Typ" styleClass="documents-filter-label"/>
+                            <ComboBox fx:id="typeFilter" promptText="Alle Typen" onAction="#handleFilter" styleClass="documents-combo"/>
+                        </HBox>
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="documents-filter-group">
+                            <Label text="Scope" styleClass="documents-filter-label"/>
+                            <ComboBox fx:id="scopeFilter" promptText="Alle" onAction="#handleFilter" styleClass="documents-combo"/>
+                        </HBox>
+                        <Button text="Dokument hochladen" styleClass="btn-primary" onAction="#handleUpload"/>
+                    </HBox>
+
+                    <TableView fx:id="documentsTable" styleClass="documents-table">
+                        <columns>
+                            <TableColumn fx:id="colName" text="Dateiname" prefWidth="280"/>
+                            <TableColumn fx:id="colType" text="Typ" prefWidth="150"/>
+                            <TableColumn fx:id="colScope" text="Scope" prefWidth="120"/>
+                            <TableColumn fx:id="colSize" text="Größe" prefWidth="110"/>
+                            <TableColumn fx:id="colDate" text="Hochgeladen" prefWidth="190"/>
+                        </columns>
+                    </TableView>
+
+                    <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="documents-footer">
+                        <Label fx:id="statusLabel" styleClass="status-bar-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Anzeigen" styleClass="ghost-btn" onAction="#handlePreview"/>
+                        <Button text="Herunterladen" styleClass="ghost-btn" onAction="#handleDownload"/>
+                        <Button text="Löschen" styleClass="btn-danger" onAction="#handleDelete"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    </BorderPane>
+
+</StackPane>

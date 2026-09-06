@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="de.mkysarte.bewerbungsmanager.ui.screen.ApplicationFormController"
+           stylesheets="@../styles/app.css"
+           styleClass="form-root">
+
+    <BorderPane>
+
+    <top>
+        <VBox styleClass="form-page-header" spacing="6">
+            <Label fx:id="formTitleLabel" text="Neue Bewerbung anlegen" styleClass="headline-title"/>
+            <Label fx:id="formSubtitleLabel" text="Geben Sie alle relevanten Informationen zur Bewerbung ein." styleClass="headline-sub"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="form-scroll">
+            <VBox styleClass="form-page" spacing="18">
+
+                <!-- ── Sektion 1: Unternehmensinformationen ── -->
+                <VBox styleClass="form-section form-section-card" spacing="16">
+                    <Label text="Unternehmensinformationen" styleClass="form-section-title"/>
+
+                    <GridPane hgap="16" vgap="14">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <Label text="Firmenname *" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="firmaField" promptText="z.B. Muster GmbH"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+
+                        <Label text="URL" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <TextField fx:id="urlField" promptText="https://firma.de"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Kontaktperson" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="ansprechpartnerField" promptText="z.B. Max Mustermann"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+
+                        <Label text="E-Mail-Adresse" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <TextField fx:id="emailField" promptText="recruiting@firma.de"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Label text="Telefonnummer" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <TextField fx:id="telefonField" promptText="+49 ..."
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+
+                        <Label text="Art der Bewerbung" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        <ComboBox fx:id="applicationTypeComboBox" maxWidth="Infinity"
+                                  promptText="Wählen Sie eine Option"
+                                  styleClass="form-input"
+                                  GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                        <Label text="Standort *" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                        <TextField fx:id="ortField" promptText="z.B. Berlin / Remote"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+
+                        <Label text="Position *" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                        <TextField fx:id="stelleField" promptText="z.B. Software Developer"
+                                   styleClass="form-input"
+                                   GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+                        <Label fx:id="errorLabel" styleClass="error-label" wrapText="true"
+                               visible="false" managed="false"
+                               GridPane.rowIndex="8" GridPane.columnIndex="0"
+                               GridPane.columnSpan="2"/>
+                    </GridPane>
+                </VBox>
+
+                <!-- ── Sektion 2: Unterlagen-Checkliste ── -->
+                <VBox styleClass="form-section form-section-card" spacing="14">
+                    <Label text="Unterlagen-Checkliste" styleClass="form-section-title"/>
+
+                    <HBox spacing="18" styleClass="attachment-columns">
+                        <VBox spacing="12" styleClass="attachment-column">
+                            <CheckBox fx:id="lebenslaufCheck" text="Lebenslauf" styleClass="attachment-check"
+                                      onAction="#aktualisiereBundleKnopf"/>
+                            <CheckBox fx:id="zertifikateCheck" text="Zertifikate" styleClass="attachment-check"
+                                      onAction="#aktualisiereBundleKnopf"/>
+                            <CheckBox fx:id="pdfBundleCheck" text="PDF-Bündel gewünscht" styleClass="attachment-check"
+                                      onAction="#aktualisiereBundleKnopf"/>
+                        </VBox>
+                        <VBox spacing="12" styleClass="attachment-column">
+                            <CheckBox fx:id="anschreibenCheck" text="Anschreiben"
+                                       styleClass="attachment-check"
+                                       onAction="#handleAnschreibenToggle"/>
+                            <CheckBox fx:id="zeugnisseCheck" text="Zeugnisse" styleClass="attachment-check"
+                                      onAction="#aktualisiereBundleKnopf"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label text="Lebenslauf, Zertifikate und Zeugnisse werden aus &quot;Meine Unterlagen&quot; übernommen."
+                           styleClass="form-hint"/>
+
+                    <!-- Anschreiben-Upload (nur sichtbar wenn anschreibenCheck aktiviert) -->
+                    <VBox fx:id="anschreibenPanel" styleClass="upload-field form-upload-panel" spacing="10" alignment="CENTER"
+                          visible="false" managed="false">
+                        <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                        <FontIcon fx:id="anschreibenIcon" iconLiteral="far-file-alt" iconSize="32"
+                                  styleClass="upload-icon"/>
+                        <Label fx:id="anschreibenLabel" text="Anschreiben für diese Firma"
+                               styleClass="upload-caption"/>
+                        <HBox spacing="8" alignment="CENTER">
+                            <Button fx:id="anschreibenPickBtn" text="Datei auswählen"
+                                    styleClass="ghost-btn" onAction="#handlePickAnschreiben"/>
+                            <Button fx:id="anschreibenDownloadBtn" text="Datei anzeigen"
+                                    styleClass="btn-primary" visible="false" managed="false"
+                                    onAction="#handleDownloadAnschreiben"/>
+                        </HBox>
+                        <Label text="Bitte das firmenspezifische Anschreiben hochladen."
+                               styleClass="form-hint"/>
+                    </VBox>
+
+                    <!-- Bündel: erscheint nur, wenn der Haken gesetzt und etwas verknuepft ist -->
+                    <Button fx:id="bundleDownloadBtn" text="Bündel herunterladen"
+                            styleClass="btn-primary" visible="false" managed="false"
+                            onAction="#handleDownloadBundle"/>
+                    <Label text="Führt Anschreiben, Lebenslauf, Zeugnisse und Zertifikate in dieser Reihenfolge zu einer PDF zusammen."
+                           styleClass="form-hint" wrapText="true"/>
+                </VBox>
+
+                <!-- ── Sektion 3: Status & Rückmeldung ── -->
+                <VBox styleClass="form-section form-section-card" spacing="14">
+                    <Label text="Status &amp; Rückmeldung" styleClass="form-section-title"/>
+
+
+
+                    <Label text="Status" styleClass="form-label"/>
+                    <ComboBox fx:id="statusComboBox" maxWidth="Infinity"
+                              styleClass="form-input"/>
+
+                    <Label text="Rückmeldung" styleClass="form-label"/>
+                    <TextArea fx:id="notizField"
+                              promptText="Notizen zur Rückmeldung des Unternehmens..."
+                              styleClass="form-textarea" prefRowCount="4"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox styleClass="form-actions" spacing="12" alignment="CENTER_RIGHT">
+            <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
+            <Button fx:id="deleteButton" text="Löschen" styleClass="btn-danger"
+                    visible="false" managed="false"
+                    onAction="#handleDelete"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Abbrechen" styleClass="ghost-btn" onAction="#handleCancel"/>
+            <Button fx:id="saveButton" text="Speichern" styleClass="btn-primary"
+                    onAction="#handleSave"/>
+        </HBox>
+    </bottom>
+
+    </BorderPane>
+</StackPane>

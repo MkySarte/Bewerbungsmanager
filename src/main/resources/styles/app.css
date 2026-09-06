@@ -1,0 +1,1478 @@
+/* ============================================================
+   Bewerbungsmanager Desktop — app.css
+   Spiegelt das Next.js-Frontend: JetBrains Mono, Light + Dark
+   ============================================================ */
+
+/* ── Farbpalette (Light) ── */
+.root {
+    -color-canvas:          #eef1f5;
+    -color-surface:         #ffffff;
+    -color-surface-strong:  #111724;
+    -color-border:          #d8dee8;
+    -color-text-main:       #111827;
+    -color-text-soft:       #4b5566;
+    -color-text-mute:       #758094;
+    -color-blue:            #2563eb;
+    -color-orange:          #ea580c;
+    -color-red:             #dc2626;
+    -color-green:           #16a34a;
+    -color-surface-hover:   #f8fafc;
+    -color-primary-hover:   #1f2937;
+    -color-text-on-primary: #f8fafc;
+
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-background-color: -color-canvas;
+}
+
+/* ── Farbpalette (Dark) ── */
+.root.dark {
+    -color-canvas:          #151b28;
+    -color-surface:         #1b2333;
+    -color-surface-strong:  #d9e5ff;
+    -color-border:          #314159;
+    -color-text-main:       #f2f6ff;
+    -color-text-soft:       #c1cbe0;
+    -color-text-mute:       #93a2c1;
+    -color-blue:            #78a3ff;
+    -color-orange:          #ffb16d;
+    -color-red:             #ff8b98;
+    -color-green:           #74d9a0;
+    -color-surface-hover:   #273247;
+    -color-primary-hover:   #c7d9ff;
+    -color-text-on-primary: #0f1a2b;
+
+    -fx-background-color: -color-canvas;
+}
+
+/* ── ScrollPane transparent ── */
+.main-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.main-scroll > .viewport {
+    -fx-background-color: -color-canvas;
+}
+
+.page-shell {
+    -fx-padding: 10 16 22 16;
+    -fx-alignment: TOP_CENTER;
+}
+
+.screen-overlay {
+    -fx-background-color: rgba(15, 23, 42, 0.34);
+    -fx-padding: 10;
+    -fx-alignment: CENTER;
+}
+
+.preview-screen-overlay {
+    -fx-background-color: -color-canvas;
+    -fx-padding: 0;
+}
+
+.overlay-shell {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.18), 28, 0, 0, 8);
+    -fx-max-height: 900;
+}
+
+.overlay-shell-compact {
+    -fx-max-width: 520;
+    -fx-pref-width: 520;
+}
+
+.confirm-screen-overlay {
+    -fx-background-color: rgba(15, 23, 42, 0.34);
+    -fx-padding: 20;
+    -fx-alignment: CENTER;
+}
+
+.confirm-overlay-shell {
+    -fx-max-width: 420;
+    -fx-pref-width: 420;
+    -fx-min-width: 420;
+    -fx-max-height: -1;
+    -fx-padding: 0;
+}
+
+.confirm-overlay-content {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-max-height: -1;
+    -fx-alignment: CENTER;
+}
+
+.screen-overlay > .overlay-shell-compact {
+    -fx-max-width: 520;
+    -fx-pref-width: 520;
+}
+
+.overlay-header-actions {
+    -fx-padding: 10 12 0 12;
+}
+
+.overlay-content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 0 20 20;
+    -fx-border-radius: 0 0 20 20;
+}
+
+.admin-overlay-panel {
+    -fx-padding: 10 16 18 16;
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.confirm-overlay-panel {
+    -fx-padding: 18 18 16 18;
+    -fx-spacing: 10;
+    -fx-background-radius: 20;
+}
+
+.confirm-overlay-panel-info,
+.confirm-overlay-panel-warning,
+.confirm-overlay-panel-confirm,
+.confirm-overlay-panel-danger {
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.18), 28, 0, 0, 8);
+}
+
+.confirm-overlay-panel-confirm,
+.confirm-overlay-panel-warning {
+    -fx-background-color: -color-surface;
+}
+
+.confirm-overlay-panel-danger {
+    -fx-background-color: -color-surface;
+}
+
+.confirm-overlay-panel-info {
+    -fx-background-color: -color-surface;
+}
+
+.documents-delete-panel,
+.form-delete-panel {
+    -fx-max-width: 520;
+    -fx-pref-width: 520;
+    -fx-padding: 16 18 18 18;
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 20;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.18), 28, 0, 0, 8);
+}
+
+.documents-inline-overlay {
+    -fx-background-color: transparent;
+    -fx-padding: 28;
+    -fx-alignment: CENTER;
+}
+
+.admin-overlay-actions {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-padding: 4 0 0 0;
+    -fx-spacing: 8;
+}
+
+.overlay-form-stack {
+    -fx-spacing: 10;
+    -fx-padding: 2 0 0 0;
+}
+
+.overlay-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.overlay-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+    -fx-line-spacing: 1px;
+}
+
+.overlay-warning {
+    -fx-background-color: #fff7ed;
+    -fx-border-color: #fed7aa;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 7 10 7 10;
+    -fx-text-fill: #9a3412;
+    -fx-font-size: 12px;
+}
+
+.overlay-warning-warning {
+    -fx-background-color: #fff7ed;
+    -fx-border-color: #fed7aa;
+    -fx-text-fill: #9a3412;
+}
+
+.overlay-warning-info {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-text-fill: #1d4ed8;
+}
+
+.overlay-warning-danger {
+    -fx-background-color: #fef2f2;
+    -fx-border-color: #fecaca;
+    -fx-text-fill: #b91c1c;
+}
+
+.overlay-section-header {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10;
+    -fx-padding: 16 20 10 20;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.overlay-section-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -color-text-main;
+}
+
+.section-header-icon {
+    -fx-icon-color: -color-text-soft;
+    -fx-translate-x: 2;
+}
+
+.preview-overlay-shell {
+    -fx-max-height: infinity;
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 20;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.14), 24, 0, 0, 6);
+}
+
+.preview-topbar {
+    -fx-padding: 14 18 14 18;
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 20 20 0 0;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.preview-heading {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.preview-file-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+}
+
+.preview-toolbar {
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.preview-scroll {
+    -fx-background-color: -color-canvas;
+    -fx-background: -color-canvas;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0 0 20 20;
+    -fx-padding: 0 0 16 0;
+}
+
+.preview-scroll > .viewport {
+    -fx-background-color: -color-canvas;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.preview-scroll .corner {
+    -fx-background-color: -color-canvas;
+}
+
+.preview-pages-box {
+    -fx-background-color: -color-canvas;
+    -fx-background-radius: 0 0 20 20;
+    -fx-padding: 24 24 24 24;
+    -fx-alignment: TOP_CENTER;
+}
+
+.preview-toolbar-label {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+    -fx-min-width: 72;
+    -fx-alignment: CENTER;
+}
+
+.preview-page {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #d8dee8;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-padding: 8;
+}
+
+.preview-icon-btn {
+    -fx-min-width: 38;
+    -fx-pref-width: 38;
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-padding: 0;
+}
+
+.preview-icon-btn .ikonli-font-icon {
+    -fx-icon-color: -color-text-soft;
+}
+
+.preview-icon-btn:hover .ikonli-font-icon {
+    -fx-icon-color: -color-text-main;
+}
+
+.preview-topbar .ghost-btn,
+.preview-topbar .preview-toolbar-label {
+    -fx-alignment: CENTER;
+}
+
+.preview-placeholder {
+    -fx-padding: 32;
+    -fx-text-fill: -color-text-soft;
+}
+
+/* ============================================================
+   Topbar
+   ============================================================ */
+.topbar {
+    -fx-background-color: -color-surface;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-min-height: 38px;
+    -fx-padding: 0 12 0 12;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.brand-name {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.topbar-actions {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-spacing: 8;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+/* Primary */
+.btn-primary {
+    -fx-background-color: -color-surface-strong;
+    -fx-text-fill: -color-text-on-primary;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 10;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+.btn-primary:hover {
+    -fx-background-color: -color-primary-hover;
+}
+.btn-primary:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* Ghost */
+.ghost-btn {
+    -fx-background-color: -color-surface;
+    -fx-text-fill: -color-text-main;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.ghost-btn:hover {
+    -fx-background-color: -color-surface-hover;
+}
+
+/* Icon-Button (Moon/Sun) */
+.icon-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 6 7 6 7;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.icon-btn:hover {
+    -fx-background-color: -color-surface-hover;
+}
+.icon-btn .ikonli-font-icon {
+    -fx-icon-color: -color-text-soft;
+}
+
+/* Link */
+.link-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-soft;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-padding: 8 6 8 6;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.link-btn:hover {
+    -fx-text-fill: -color-text-main;
+}
+
+/* Danger */
+.btn-danger {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-red;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-red;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.btn-danger:hover {
+    -fx-background-color: #fef2f2;
+}
+
+/* ============================================================
+   Login
+   ============================================================ */
+.login-root {
+    -fx-background-color: -color-canvas;
+}
+
+.auth-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 32 32 32 32;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 16, 0, 0, 4);
+}
+
+.auth-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.auth-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-soft;
+}
+
+.auth-link {
+    -fx-text-fill: -color-blue;
+    -fx-font-size: 12px;
+    -fx-padding: 4 0 0 0;
+    -fx-border-color: transparent;
+}
+
+.auth-link:hover {
+    -fx-text-fill: derive(-color-blue, -10%);
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+.dashboard-root {
+    -fx-background-color: -color-canvas;
+}
+
+.dashboard-main {
+    -fx-background-color: -color-canvas;
+    -fx-padding: 0 0 10 0;
+    -fx-fill-width: true;
+}
+
+.section-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 16 16 16 16;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.03), 8, 0, 0, 1);
+}
+
+.headline-block {
+    -fx-padding: 4 0 14 0;
+    -fx-spacing: 4;
+}
+
+.headline-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.headline-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+}
+
+/* ── Unterlagen ── */
+.documents-panel {
+    -fx-padding: 0 0 14 0;
+    -fx-spacing: 8;
+}
+
+.documents-panel-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.documents-upload-grid {
+    -fx-alignment: TOP_LEFT;
+    -fx-spacing: 12;
+}
+
+.upload-field {
+    -fx-background-color: linear-gradient(to bottom, #f9fbff, #f5f8fc);
+    -fx-border-color: #d6e2f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-alignment: TOP_CENTER;
+    -fx-min-height: 196;
+    -fx-pref-height: 196;
+    -fx-max-height: 196;
+}
+.upload-field:hover {
+    -fx-border-color: #b9cbe2;
+    -fx-background-color: linear-gradient(to bottom, #fbfcff, #f3f7fc);
+}
+
+.documents-section-card {
+    -fx-spacing: 12;
+}
+
+.upload-trash-btn {
+    -fx-min-width: 32;
+    -fx-pref-width: 32;
+    -fx-max-width: 32;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-max-height: 32;
+    -fx-padding: 0;
+}
+
+.upload-trash-btn .ikonli-font-icon {
+    -fx-icon-color: #7b8da5;
+}
+
+.upload-trash-btn:hover {
+    -fx-background-color: #fef2f2;
+    -fx-border-color: #fecaca;
+}
+
+.upload-trash-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #dc2626;
+}
+
+.upload-icon {
+    -fx-icon-color: #8a9bb6;
+}
+.upload-icon-done {
+    -fx-icon-color: #2563eb;
+}
+.upload-caption {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #395274;
+    -fx-text-alignment: center;
+    -fx-alignment: CENTER;
+}
+.upload-caption-done {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #395274;
+    -fx-text-alignment: center;
+    -fx-alignment: CENTER;
+    -fx-wrap-text: true;
+}
+
+/* ── Statistik ── */
+.stats-section {
+    -fx-padding: 0 0 12 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.stat-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-cursor: hand;
+    -fx-min-height: 72;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.02), 8, 0, 0, 1);
+}
+.stat-card:hover {
+    -fx-background-color: -color-surface-hover;
+}
+
+.stat-card-active {
+    -fx-border-color: -color-blue;
+    -fx-border-width: 2;
+}
+
+.stat-count {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.stat-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-text-soft;
+}
+
+.stat-icon-blue   { -fx-icon-color: -color-blue;   }
+.stat-icon-orange { -fx-icon-color: -color-orange;  }
+.stat-icon-red    { -fx-icon-color: -color-red;     }
+.stat-icon-green  { -fx-icon-color: -color-green;   }
+
+/* ── Toolbar ── */
+.toolbar {
+    -fx-padding: 0 0 10 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.search-wrap {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 0 12 0 12;
+    -fx-alignment: CENTER_LEFT;
+    -fx-min-height: 40;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.02), 8, 0, 0, 1);
+}
+
+.search-icon-node {
+    -fx-icon-color: -color-text-mute;
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-main;
+    -fx-prompt-text-fill: -color-text-mute;
+    -fx-padding: 10 0 10 0;
+}
+.search-input:focused {
+    -fx-background-color: transparent;
+}
+
+.toolbar-actions {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-spacing: 8;
+}
+
+.status-bar-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-mute;
+}
+
+/* ── Bewerbungsliste ── */
+.applications-list {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.applications-list .scroll-bar:vertical,
+.applications-list .scroll-bar:horizontal,
+.results-list .scroll-bar:vertical,
+.results-list .scroll-bar:horizontal,
+.saved-search-list .scroll-bar:vertical,
+.saved-search-list .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-padding: 0;
+}
+
+.applications-list .scroll-bar .thumb,
+.results-list .scroll-bar .thumb,
+.saved-search-list .scroll-bar .thumb {
+    -fx-background-color: transparent;
+}
+
+.applications-section {
+    -fx-padding: 0 0 8 0;
+    -fx-fill-width: true;
+}
+
+.applications-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 0 10 0;
+}
+.applications-list .list-cell:selected,
+.applications-list .list-cell:hover {
+    -fx-background-color: transparent;
+}
+
+.application-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+    -fx-background-radius: 16;
+    -fx-padding: 24 22 22 22;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.03), 10, 0, 0, 1);
+}
+.application-card:hover {
+    -fx-border-color: derive(-color-border, -10%);
+    -fx-background-color: -color-surface-hover;
+}
+
+.application-company {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.application-title-block {
+    -fx-spacing: 8;
+}
+
+.application-company-icon-wrap {
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-pref-width: 38;
+    -fx-pref-height: 38;
+    -fx-background-color: #edf3ff;
+    -fx-background-radius: 999;
+    -fx-alignment: CENTER;
+}
+
+.application-company-icon {
+    -fx-icon-color: #2563eb;
+}
+
+.application-position {
+    -fx-font-size: 16px;
+    -fx-text-fill: -color-text-soft;
+    -fx-padding: 2 0 10 0;
+}
+
+.application-meta-item {
+    -fx-font-size: 14px;
+    -fx-text-fill: #49627e;
+}
+
+.application-meta-row {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 42;
+    -fx-padding: 12 0 6 0;
+}
+
+.application-meta-box {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 12;
+}
+
+.application-note {
+    -fx-font-size: 13px;
+    -fx-text-fill: #40566f;
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 0;
+    -fx-min-height: 44;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.application-note-row {
+    -fx-background-color: derive(-color-canvas, 2%);
+    -fx-background-radius: 12;
+    -fx-padding: 16 18 16 18;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.application-note-actions {
+    -fx-alignment: CENTER_RIGHT;
+    -fx-spacing: 10;
+}
+
+.application-note-row .application-note {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.inline-note-editor {
+    -fx-pref-row-count: 3;
+    -fx-min-height: 88;
+}
+
+.inline-note-actions {
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.status-context-menu {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 14;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-padding: 8;
+}
+
+.status-context-menu .menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 8 12 8 12;
+}
+
+.status-context-menu .menu-item .label {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-main;
+}
+
+.status-context-menu .menu-item:focused,
+.status-context-menu .menu-item:hover {
+    -fx-background-color: derive(-color-canvas, 4%);
+}
+
+.meta-icon {
+    -fx-icon-color: -color-text-mute;
+}
+
+/* ── Status-Badges ── */
+.badge {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 3 10 3 10;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+}
+
+.badge-gray   { -fx-background-color: #f1f5f9; -fx-text-fill: #64748b; -fx-border-color: #e2e8f0; }
+.badge-orange { -fx-background-color: #fff7ed; -fx-text-fill: #c2410c; -fx-border-color: #fed7aa; }
+.badge-red    { -fx-background-color: #fef2f2; -fx-text-fill: #b91c1c; -fx-border-color: #fecaca; }
+.badge-green  { -fx-background-color: #f0fdf4; -fx-text-fill: #15803d; -fx-border-color: #bbf7d0; }
+
+.root.dark .badge-gray   { -fx-background-color: #1e293b; -fx-text-fill: #94a3b8; -fx-border-color: #334155; }
+.root.dark .badge-orange { -fx-background-color: #431407; -fx-text-fill: #ffb16d; -fx-border-color: #7c2d12; }
+.root.dark .badge-red    { -fx-background-color: #450a0a; -fx-text-fill: #ff8b98; -fx-border-color: #7f1d1d; }
+.root.dark .badge-green  { -fx-background-color: #052e16; -fx-text-fill: #74d9a0; -fx-border-color: #14532d; }
+
+/* ── Leer-Zustand ── */
+.empty-panel {
+    -fx-padding: 48 24 48 24;
+    -fx-alignment: CENTER;
+    -fx-spacing: 12;
+}
+.empty-icon      { -fx-icon-color: -color-text-mute; }
+.empty-title     { -fx-font-family: "JetBrains Mono", monospace; -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: -color-text-main; }
+.empty-subtitle  { -fx-font-size: 13px; -fx-text-fill: -color-text-soft; }
+
+/* ============================================================
+   Formular
+   ============================================================ */
+.form-root {
+    -fx-background-color: -color-surface;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0 0 20 20;
+}
+.form-page-header {
+    -fx-padding: 18 22 6 22;
+    -fx-background-color: -color-surface;
+}
+.form-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-fit-to-width: true;
+}
+.form-scroll > .viewport {
+    -fx-background-color: -color-surface;
+}
+.form-page {
+    -fx-background-color: -color-surface;
+    -fx-padding: 0 26 18 26;
+}
+.form-grid {
+    -fx-background-color: transparent;
+}
+.form-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-soft;
+    -fx-padding: 0 0 2 0;
+}
+.form-input,
+.form-textarea {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-main;
+    -fx-prompt-text-fill: -color-text-mute;
+    -fx-padding: 7 12 7 12;
+}
+.form-input:focused,
+.form-textarea:focused {
+    -fx-border-color: -color-blue;
+}
+.form-actions {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.form-textarea {
+    -fx-pref-row-count: 5;
+}
+.error-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-red;
+    -fx-wrap-text: true;
+}
+
+/* ── Formular-Sektionen ── */
+.form-sections {
+    -fx-background-color: -color-surface;
+}
+.form-section {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.form-section-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: transparent transparent -color-border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 18 0 18 0;
+    -fx-effect: none;
+}
+.form-section-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+    -fx-padding: 0 0 4 0;
+}
+.form-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-text-mute;
+    -fx-wrap-text: true;
+}
+.attachment-check {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-main;
+}
+.attachment-columns {
+    -fx-alignment: TOP_LEFT;
+}
+.attachment-column {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+.attachment-check:disabled {
+    -fx-opacity: 0.7;
+}
+.attachment-linked {
+    -fx-text-fill: -color-blue;
+}
+.form-upload-panel {
+    -fx-min-height: 150;
+    -fx-pref-height: 150;
+    -fx-max-height: 150;
+    -fx-alignment: CENTER;
+}
+
+.form-scroll {
+    -fx-border-color: transparent;
+}
+
+/* Der Rahmen gehört NUR nach aussen. Bekaeme jeder Bereich (Kopf, Inhalt,
+   Knopfleiste) eigenen Rahmen und Radius, zerfiele der Dialog optisch in drei
+   gestapelte Kaesten statt einer Karte. */
+.modern-dialog {
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.22), 28, 0, 0, 10);
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+}
+
+.modern-dialog .content.label {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+}
+
+/* Innen nur Flaeche, kein Rahmen - abgerundet wird jeweils nur nach aussen hin. */
+.modern-dialog:header *.header-panel {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 18 18 10 18;
+}
+
+.modern-dialog:header *.header-panel .label {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.modern-dialog > *.content {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 0;
+    -fx-padding: 4 18 16 18;
+}
+
+/* Ohne Kopfzeile muss der Inhalt oben abrunden, sonst stehen die Ecken vor. */
+.modern-dialog:no-header > *.content {
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 18 18 16 18;
+}
+
+.modern-dialog > *.button-bar > *.container {
+    -fx-background-color: -color-surface;
+    -fx-background-radius: 0 0 18 18;
+    -fx-padding: 0 18 18 18;
+    -fx-spacing: 10;
+}
+
+/* Knoepfe wie im Rest der Anwendung: der vorgeschlagene kraeftig, die übrigen ruhig. */
+.modern-dialog .button-bar .button {
+    -fx-background-color: -color-surface;
+    -fx-text-fill: -color-text-main;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 10;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.modern-dialog .button-bar .button:hover {
+    -fx-background-color: -color-surface-hover;
+}
+
+.modern-dialog .button-bar .button:default {
+    -fx-background-color: -color-surface-strong;
+    -fx-text-fill: -color-text-on-primary;
+    -fx-border-width: 0;
+}
+
+.modern-dialog .button-bar .button:default:hover {
+    -fx-background-color: -color-primary-hover;
+}
+
+/* ── Fortschrittsbalken (Unterlagen) ── */
+.application-progress-row {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 12;
+    -fx-padding: 10 0 10 0;
+}
+
+.application-progress-block {
+    -fx-spacing: 8;
+    -fx-padding: 8 0 6 0;
+}
+
+.application-progress-header {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.application-progress-percent {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-soft;
+}
+
+.application-progress-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-soft;
+    -fx-min-width: 140;
+}
+.application-progress-track {
+    -fx-background-color: derive(-color-border, 10%);
+    -fx-background-radius: 999;
+    -fx-min-height: 12;
+    -fx-max-height: 12;
+    -fx-pref-height: 12;
+}
+.application-progress-fill {
+    -fx-background-radius: 999;
+    -fx-min-height: 12;
+    -fx-max-height: 12;
+    -fx-pref-height: 12;
+}
+
+/* ── Status-Badge-Button auf Karte ── */
+.card-status-btn {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-pref-height: 34;
+    -fx-max-height: 34;
+}
+.card-status-btn .ikonli-font-icon {
+    -fx-icon-size: 10px;
+    -fx-icon-color: inherit;
+}
+.card-status-gray   { -fx-background-color:#f1f5f9; -fx-text-fill:#425b76; -fx-border-color:#dbe5f0; }
+.card-status-orange { -fx-background-color:#fff7ed; -fx-text-fill:#c2410c; -fx-border-color:#fed7aa; }
+.card-status-red    { -fx-background-color:#fef2f2; -fx-text-fill:#b91c1c; -fx-border-color:#fecaca; }
+.card-status-green  { -fx-background-color:#f0fdf4; -fx-text-fill:#15803d; -fx-border-color:#bbf7d0; }
+.card-status-btn:hover { -fx-border-color: derive(-color-border, -12%); -fx-background-color: derive(-color-surface-hover, 2%); }
+
+.card-delete-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #d8e2ec;
+    -fx-border-width: 1;
+    -fx-padding: 6 7 6 7;
+    -fx-cursor: hand;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-min-width: 34;
+    -fx-min-height: 34;
+}
+
+.card-delete-btn .ikonli-font-icon {
+    -fx-icon-color: #7b8da5;
+}
+
+.card-delete-btn:hover {
+    -fx-background-color: #fef2f2;
+    -fx-border-color: #fecaca;
+}
+
+.card-delete-btn:hover .ikonli-font-icon {
+    -fx-icon-color: #dc2626;
+}
+
+.root.dark .card-status-gray   { -fx-background-color:#1e293b; -fx-text-fill:#94a3b8; -fx-border-color:#334155; }
+.root.dark .card-status-orange { -fx-background-color:#431407; -fx-text-fill:#ffb16d; -fx-border-color:#7c2d12; }
+.root.dark .card-status-red    { -fx-background-color:#450a0a; -fx-text-fill:#ff8b98; -fx-border-color:#7f1d1d; }
+.root.dark .card-status-green  { -fx-background-color:#052e16; -fx-text-fill:#74d9a0; -fx-border-color:#14532d; }
+
+/* ── Topbar Benutzername ── */
+.topbar-username {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-soft;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-padding: 0 4 0 4;
+}
+
+.documents-root { -fx-background-color: -color-canvas; }
+
+.documents-page {
+    -fx-padding: 0 24 28 24;
+}
+
+.documents-page-headline {
+    -fx-padding: 28 0 0 0;
+}
+
+.documents-page-card {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.05), 16, 0, 0, 3);
+}
+
+.documents-toolbar {
+    -fx-padding: 0 0 4 0;
+}
+
+.documents-filter-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+.documents-filter-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-soft;
+}
+
+.documents-filter-group {
+    -fx-background-color: derive(-color-canvas, 4%);
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12 8 12;
+}
+
+.documents-filter-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-text-soft;
+}
+
+.documents-combo {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+}
+
+.documents-footer {
+    -fx-padding: 4 0 0 0;
+}
+
+.documents-table {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+}
+
+.documents-table .column-header-background {
+    -fx-background-color: derive(-color-canvas, 3%);
+    -fx-background-radius: 14 14 0 0;
+}
+
+.documents-table .column-header,
+.documents-table .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -color-border transparent;
+}
+
+.documents-table .label {
+    -fx-text-fill: -color-text-soft;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 12px;
+}
+
+.documents-table .table-row-cell {
+    -fx-background-color: -color-surface;
+    -fx-border-color: transparent transparent derive(-color-border, 8%) transparent;
+}
+
+.documents-table .table-row-cell:selected {
+    -fx-background-color: derive(-color-blue, 92%);
+}
+
+.documents-table .table-cell {
+    -fx-text-fill: -color-text-main;
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+}
+
+/* ── Initial-Zugang im Login (Demo + Notfallzugang) ───────────
+   Dauerhaft sichtbar, damit dieser Weg nie vergessen wird.     */
+.initial-access-box {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #bfdbfe;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10 12 10 12;
+}
+
+.initial-access-title {
+    -fx-text-fill: #1d4ed8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.initial-access-credentials {
+    -fx-text-fill: #1e3a8a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.initial-access-hint {
+    -fx-text-fill: -color-text-soft;
+    -fx-font-size: 11px;
+    -fx-line-spacing: 1px;
+}
+
+.root.dark .initial-access-box {
+    -fx-background-color: #172554;
+    -fx-border-color: #1e40af;
+}
+
+.root.dark .initial-access-title      { -fx-text-fill: #93c5fd; }
+.root.dark .initial-access-credentials { -fx-text-fill: #dbeafe; }
+
+/* ── Erinnerungen auf der Bewerbungskarte ────────────────────
+   Auffaellig genug, um nicht überlesen zu werden, aber ruhig
+   genug, um nicht bei jeder Karte zu stören.               */
+.reminder-row {
+    -fx-background-color: #fff7ed;
+    -fx-border-color: #fed7aa;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10 6 10;
+}
+
+.reminder-icon {
+    -fx-icon-color: #9a3412;
+}
+
+.reminder-text {
+    -fx-text-fill: #9a3412;
+    -fx-font-size: 12px;
+}
+
+.root.dark .reminder-row {
+    -fx-background-color: #431407;
+    -fx-border-color: #7c2d12;
+}
+
+.root.dark .reminder-icon { -fx-icon-color: #ffb16d; }
+.root.dark .reminder-text { -fx-text-fill: #ffb16d; }
+
+/* Neutrale Rückmeldung im Formular (gleiche Stelle wie Fehler, nur nicht rot) */
+.error-label.info-label {
+    -fx-text-fill: #1d4ed8;
+}
+
+.root.dark .error-label.info-label {
+    -fx-text-fill: #93c5fd;
+}
+
+/* ── Statuszeile auf der Karte (Datum + ggf. Menü) ───────────
+   Ruhiger als eine Erinnerung: hier steht nur, was ist.      */
+.status-line-row {
+    -fx-padding: 4 2 4 2;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.status-line-icon {
+    -fx-icon-color: -color-text-mute;
+}
+
+.status-line-text {
+    -fx-text-fill: -color-text-soft;
+    -fx-font-size: 12px;
+}
+
+/* Kleines Menü direkt in der Zeile (Rhythmus, Nachfassfrist) */
+.card-inline-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 2 8 2 8;
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-text-soft;
+    -fx-cursor: hand;
+}
+
+.card-inline-btn:hover {
+    -fx-background-color: -color-surface-hover;
+    -fx-text-fill: -color-text-main;
+}
+
+.card-inline-btn .ikonli-font-icon {
+    -fx-icon-size: 9;
+    -fx-icon-color: -color-text-mute;
+}
+
+/* Einstellungen sind länger geworden - der Dialog scrollt */
+/* Kein fester Hoehendeckel: die Hoehe wird im Code an die Fensterhoehe gebunden,
+   sonst bliebe auf hohen Fenstern unten Platz ungenutzt und man scrollte trotzdem. */
+.settings-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.settings-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Einheit neben einem Zahlenfeld ("30 Minuten") - die Zahl allein sagt nichts. */
+.form-unit {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-soft;
+}

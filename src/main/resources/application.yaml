@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: bewerbungsmanager-desktop
+
+  # Local-First: kein HTTP-Server, kein Netzwerk-Listener
+  main:
+    web-application-type: none
+
+  # Datenbankdatei und Schluessel stehen erst nach der Anmeldung fest und werden
+  # von BewerbungsmanagerApp als Properties uebergeben, bevor Spring startet.
+  datasource:
+    url: ${app.db.url}
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # Foreign Keys muessen in SQLite explizit eingeschaltet werden.
+      # Der Schluessel steckt bereits in der URL, hier also nur noch die Pragmas.
+      connection-init-sql: "PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;"
+      # SQLite vertraegt nur einen gleichzeitigen Schreiber
+      maximum-pool-size: 1
+      minimum-idle: 1
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      # Schema wird beim Start angelegt (Local-First: kein Flyway)
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
