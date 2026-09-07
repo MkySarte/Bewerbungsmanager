@@ -26,7 +26,10 @@ import de.mkysarte.bewerbungsmanager.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -108,9 +111,27 @@ public class BewerbungseintragService {
         return toResponse(entity);
     }
 
+    /**
+     * Alle Bewerbungen, <b>neueste zuerst</b>.
+     *
+     * <p>Die Reihenfolge gehoert hierher und nicht in die Oberflaeche: Ohne sie kaeme
+     * {@code findAll()} in Schluesselreihenfolge zurueck, also aelteste oben - eine gerade
+     * angelegte Bewerbung stuende dann ganz unten und muesste gesucht werden. Bei gleichem
+     * Zeitstempel entscheidet die Id, denn ein Import legt viele Eintraege fast gleichzeitig an.
+     */
     @Transactional(readOnly = true)
     public List<BewerbungseintragResponse> getAllBewerbungseintraege() {
-        return bewerbungseintragRepository.findAll().stream().map(this::toResponse).toList();
+        Comparator<BewerbungseintragEntity> neuesteZuerst = Comparator
+                .comparing(BewerbungseintragEntity::getCreatedAt,
+                        Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(BewerbungseintragEntity::getBewerbungseintragId,
+                        Comparator.nullsFirst(Comparator.naturalOrder()))
+                .reversed();
+
+        return bewerbungseintragRepository.findAll().stream()
+                .sorted(neuesteZuerst)
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional
@@ -295,6 +316,23 @@ public class BewerbungseintragService {
         return toResponse(bewerbungseintragRepository.save(entity));
     }
 
+    /**
+     * Setzt das Datum, seit dem diese Bewerbung als Entwurf liegt.
+     *
+     * <p>Anders als die Abschlussdaten ist das eine Spalte am Eintrag selbst, kein
+     * Verlaufseintrag - deshalb eine eigene Methode statt {@link #setzeStatusDatum}.
+     */
+    @Transactional
+    public BewerbungseintragResponse setzeErstelltAm(Long id, LocalDate datum) {
+        BewerbungseintragEntity entity = bewerbungseintragRepository.findById(id)
+                .orElseThrow(() -> AppException.notFound("Bewerbungseintrag nicht gefunden"));
+        if (datum == null) {
+            throw AppException.badRequest("Datum ist erforderlich");
+        }
+        entity.setErstelltAm(datum);
+        return toResponse(bewerbungseintragRepository.save(entity));
+    }
+
     /** Setzt den Erinnerungsrhythmus für den Entwurf; {@code null} = globaler Standard. */
     @Transactional
     public BewerbungseintragResponse setzeEntwurfIntervall(Long id, String intervall) {
@@ -302,6 +340,49 @@ public class BewerbungseintragService {
                 .orElseThrow(() -> AppException.notFound("Bewerbungseintrag nicht gefunden"));
         entity.setEntwurfErinnerungIntervall(intervall);
         return toResponse(bewerbungseintragRepository.save(entity));
+    }
+
+    /**
+     * Setzt oder korrigiert das Datum, an dem diese Bewerbung einen Status erreicht hat.
+     *
+     * <p>Notwendig, weil {@code abgeschicktAm} und die Abschlussdaten keine Spalten am Eintrag
+     * sind, sondern aus dem Statusverlauf abgelesen werden. Wer eine bestehende Liste einspielt,
+     * hat aber vor Wochen abgeschickt - ohne diese Methode stuende dort der Importzeitpunkt,
+     * und Nachfassfrist wie Faelligkeit rechneten auf einem falschen Tag.
+     *
+     * <p>Gibt es zu dem Titel noch keine Verlaufszeile, wird eine angelegt. Genau das braucht
+     * der Import: Eine Bewerbung, die als Absage hereinkommt, hat nie einen Wechsel auf
+     * "abgeschickt" durchlaufen - ein Absendedatum hat sie trotzdem.
+     *
+     * <p>Der aktuelle Status des Eintrags bleibt unberuehrt; hier wird nur der Verlauf geführt.
+     */
+    @Transactional
+    public BewerbungseintragResponse setzeStatusDatum(Long id, String statusTitel, LocalDate datum) {
+        BewerbungseintragEntity entity = bewerbungseintragRepository.findById(id)
+                .orElseThrow(() -> AppException.notFound("Bewerbungseintrag nicht gefunden"));
+        if (datum == null) {
+            throw AppException.badRequest("Datum ist erforderlich");
+        }
+        StatusEntity status = statusRepository.findByTitel(statusTitel)
+                .orElseThrow(() -> AppException.badRequest("Status existiert nicht: " + statusTitel));
+
+        StatusVerlaufEntity verlauf = massgeblicheVerlaufszeile(id, status.getTitel())
+                .orElseGet(() -> {
+                    StatusVerlaufEntity neue = new StatusVerlaufEntity();
+                    neue.setBewerbungseintragId(id);
+                    neue.setStatusId(status.getStatusId());
+                    neue.setStatusTitel(status.getTitel());
+                    return neue;
+                });
+        // Die Uhrzeit des urspruenglichen Wechsels beibehalten, damit sich beim reinen
+        // Korrigieren des Tages nichts still verschiebt.
+        LocalTime uhrzeit = verlauf.getGeaendertAm() != null
+                ? verlauf.getGeaendertAm().toLocalTime()
+                : LocalTime.MIDNIGHT;
+        verlauf.setGeaendertAm(datum.atTime(uhrzeit));
+        statusVerlaufRepository.save(verlauf);
+
+        return toResponse(entity);
     }
 
     /**
@@ -340,17 +421,29 @@ public class BewerbungseintragService {
         statusVerlaufRepository.save(verlauf);
     }
 
-    /** Letzter Zeitpunkt, zu dem dieser Statustitel gesetzt wurde - oder null. */
+    /** Zeitpunkt, zu dem dieser Statustitel zuletzt gesetzt wurde - oder null. */
     private LocalDateTime letzterStatuswechsel(Long bewerbungseintragId, String statusTitel) {
-        if (bewerbungseintragId == null) {
-            return null;
+        return massgeblicheVerlaufszeile(bewerbungseintragId, statusTitel)
+                .map(StatusVerlaufEntity::getGeaendertAm)
+                .orElse(null);
+    }
+
+    /**
+     * Die Verlaufszeile, die fuer diesen Statustitel gilt: die zuletzt <em>geschriebene</em>.
+     *
+     * <p>Nicht die mit dem spaetesten Datum - sonst koennte ein rueckdatierter Eintrag eine
+     * aeltere Zeile desselben Titels nach vorn spuelen.
+     */
+    private Optional<StatusVerlaufEntity> massgeblicheVerlaufszeile(Long bewerbungseintragId,
+                                                                    String statusTitel) {
+        if (bewerbungseintragId == null || statusTitel == null) {
+            return Optional.empty();
         }
-        return statusVerlaufRepository.findByBewerbungseintragIdOrderByGeaendertAmDesc(bewerbungseintragId)
+        return statusVerlaufRepository
+                .findByBewerbungseintragIdOrderByStatusVerlaufIdDesc(bewerbungseintragId)
                 .stream()
                 .filter(v -> statusTitel.equalsIgnoreCase(v.getStatusTitel()))
-                .map(StatusVerlaufEntity::getGeaendertAm)
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     private void validateReferences(Long bewerbungscontainerId, Long firmaId, Long stellenausschreibungId, Long statusId) {

@@ -40,6 +40,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -51,11 +53,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.ArrayList;
 
 /**
@@ -458,12 +463,27 @@ public class DashboardController {
     // =====================================================================
 
     private void loadApplications() {
+        loadApplications(null);
+    }
+
+    /**
+     * Laedt die Liste neu.
+     *
+     * @param sichtbarHalten Id einer Bewerbung, die danach sichtbar sein muss - oder
+     *                       {@code null}. Ohne das verschwaende eine gerade angelegte Bewerbung
+     *                       lautlos, wenn gerade ein Filter wie "Erfolge" aktiv ist.
+     */
+    private void loadApplications(Long sichtbarHalten) {
         statusBarLabel.setText("Lade Bewerbungen…");
         AsyncRunner.run(
                 bewerbungseintragService::getAllBewerbungseintraege,
                 applications -> {
                     allApplications.setAll(applications);
                     applyFilter();
+                    if (sichtbarHalten != null && !istInDerListe(sichtbarHalten)) {
+                        activeStatusFilter = null;
+                        applyFilter();
+                    }
                     buildStatsGrid(applications);
                     statusBarLabel.setText("");
                 },
@@ -474,8 +494,13 @@ public class DashboardController {
         );
     }
 
+    private boolean istInDerListe(Long bewerbungseintragId) {
+        return applicationList.getItems().stream()
+                .anyMatch(a -> bewerbungseintragId.equals(a.bewerbungseintragId()));
+    }
+
     // =====================================================================
-    //  Statistik-Kacheln (4 feste Karten)
+    //  Statistik-Kacheln (6 feste Karten)
     // =====================================================================
 
     private void buildStatsGrid(List<BewerbungseintragResponse> applications) {
@@ -493,15 +518,21 @@ public class DashboardController {
         long faellig     = applications.stream()
                 .filter(erinnerungService::istFaellig)
                 .count();
+        long entwuerfe   = applications.stream()
+                .filter(a -> ErinnerungService.STATUS_ENTWURF.equalsIgnoreCase(a.statusTitel()))
+                .count();
 
         statsGrid.getChildren().clear();
 
+        // "Entwurf" steht vorn, weil dort jede neue Bewerbung landet - und "Gesamt" hinten:
+        // Wer gerade etwas angelegt hat, sucht den Entwurf, nicht die Summe.
         for (VBox card : List.of(
-                buildStatCard(null,           "Gesamt",       total,       "blue"),
+                buildStatCard("ENTWURF",      "Entwürfe",     entwuerfe,   "draft"),
                 buildStatCard("ABGESCHICKT",  "Abgeschickt",  abgeschickt, "orange"),
                 buildStatCard("ABSAGE",       "Absagen",      absagen,     "red"),
                 buildStatCard("ERFOLG",       "Erfolge",      erfolge,     "green"),
-                buildStatCard(FILTER_FAELLIG, "Fällig",       faellig,     "orange")
+                buildStatCard(FILTER_FAELLIG, "Fällig",       faellig,     "orange"),
+                buildStatCard(null,           "Gesamt",       total,       "blue")
         )) {
             HBox.setHgrow(card, Priority.ALWAYS);
             statsGrid.getChildren().add(card);
@@ -553,6 +584,7 @@ public class DashboardController {
             case "orange" -> "far-clock";
             case "red"    -> "fas-times-circle";
             case "green"  -> "far-check-circle";
+            case "draft"  -> "far-edit";
             default       -> "far-file-alt";
         };
     }
@@ -655,7 +687,7 @@ public class DashboardController {
                     fxmlLoader.loadWithController("/fxml/ApplicationForm.fxml");
             result.controller().setApplication(application);
             result.controller().setOnSaved(id -> {
-                loadApplications();
+                loadApplications(id);
                 hideFormOverlay();
             });
             result.controller().setOnClose(this::hideFormOverlay);
@@ -846,7 +878,8 @@ public class DashboardController {
      *
      * <p>Entwurf und Abgeschickt sind Zustaende, in denen man etwas tun muss - die bekommen ein
      * Menue direkt neben dem Datum. Absage und Erfolg sind abgeschlossen; dort ist das Datum
-     * die ganze Information, und ein Menue wäre nur Ballast.
+     * die ganze Information - anklickbar ist es trotzdem, denn wer eine bestehende Liste
+     * einspielt, braucht genau dort die Korrektur.
      */
     private HBox buildStatusZeile(BewerbungseintragResponse item) {
         String status = item.statusTitel() == null ? "" : item.statusTitel();
@@ -858,20 +891,19 @@ public class DashboardController {
             return entwurfZeile(item);
         }
         if (status.toUpperCase(java.util.Locale.ROOT).startsWith("ABSAGE")) {
-            return abschlussZeile("fas-times-circle", "Absage am ", item.absageAm());
+            return abschlussZeile("fas-times-circle", "Absage am", item.absageAm(), item, "ABSAGE");
         }
         if ("ERFOLG".equalsIgnoreCase(status)) {
-            return abschlussZeile("fas-check-circle", "Erfolg am ", item.erfolgAm());
+            return abschlussZeile("fas-check-circle", "Erfolg am", item.erfolgAm(), item, "ERFOLG");
         }
-        return abschlussZeile("far-calendar-alt", "Angelegt am ",
-                item.createdAt());
+        return abschlussZeile("far-calendar-alt", "Angelegt am", item.createdAt(), item, null);
     }
 
     /** Entwurf: seit wann er liegt, dazu der Rhythmus der Erinnerung. */
     private HBox entwurfZeile(BewerbungseintragResponse item) {
         LocalDate seit = erinnerungService.entwurfSeit(item);
-        Label text = new Label("Entwurf seit " + formatiere(seit));
-        text.getStyleClass().add("status-line-text");
+        HBox text = datumszeile("Entwurf seit", seit,
+                datum -> speichereErstelltAm(item, datum));
 
         ErinnerungsIntervall intervall = erinnerungService.effektivesIntervall(item);
         Button menue = new Button("Erinnern: " + intervall.getBezeichnung());
@@ -908,12 +940,17 @@ public class DashboardController {
         LocalDate ab = erinnerungService.nachfassenAb(item);
         boolean faellig = erinnerungService.nachfassenFaellig(item);
 
-        String abgeschickt = item.abgeschicktAm() != null
-                ? formatiere(item.abgeschicktAm().toLocalDate())
-                : "unbekannt";
-        Label text = new Label("Abgeschickt am " + abgeschickt
-                + (ab != null ? "  ·  Nachfassen ab " + formatiere(ab) : ""));
-        text.getStyleClass().add("status-line-text");
+        LocalDate abgeschickt = item.abgeschicktAm() != null
+                ? item.abgeschicktAm().toLocalDate()
+                : null;
+        HBox text = datumszeile("Abgeschickt am", abgeschickt,
+                datum -> speichereStatusDatum(item, ErinnerungService.STATUS_ABGESCHICKT, datum));
+        if (ab != null) {
+            // Das Nachfassdatum rechnet die Anwendung aus - es bleibt reiner Text.
+            Label nachfassen = new Label("  ·  Nachfassen ab " + formatiere(ab));
+            nachfassen.getStyleClass().add("status-line-text");
+            text.getChildren().add(nachfassen);
+        }
 
         Button menue = new Button("Nachfassen nach " + erinnerungService.effektiveFristTage(item) + " Tagen");
         menue.getStyleClass().add("card-inline-btn");
@@ -948,14 +985,135 @@ public class DashboardController {
         return statusZeile(faellig ? "far-clock" : "fas-paper-plane", text, menue, faellig);
     }
 
-    /** Absage und Erfolg: nur das Datum, keine Bedienung. */
-    private HBox abschlussZeile(String icon, String praefix, java.time.LocalDateTime zeitpunkt) {
-        Label text = new Label(praefix + (zeitpunkt != null ? formatiere(zeitpunkt.toLocalDate()) : "unbekannt"));
-        text.getStyleClass().add("status-line-text");
+    /** Absage und Erfolg: das Datum, sonst nichts — auch dort ist es korrigierbar. */
+    private HBox abschlussZeile(String icon, String praefix, java.time.LocalDateTime zeitpunkt,
+                                BewerbungseintragResponse item, String statusTitel) {
+        LocalDate datum = zeitpunkt != null ? zeitpunkt.toLocalDate() : null;
+        HBox text = statusTitel == null
+                ? nurText(praefix, datum)
+                : datumszeile(praefix, datum, neu -> speichereStatusDatum(item, statusTitel, neu));
         return statusZeile(icon, text, null, false);
     }
 
-    private HBox statusZeile(String iconLiteral, Label text, Button menue, boolean hervorheben) {
+    /** „Angelegt am …" hat keinen Statusverlauf hinter sich und bleibt deshalb unantastbar. */
+    private HBox nurText(String praefix, LocalDate datum) {
+        Label label = new Label(praefix + " " + formatiere(datum));
+        label.getStyleClass().add("status-line-text");
+        HBox zeile = new HBox(label);
+        zeile.setAlignment(Pos.CENTER_LEFT);
+        return zeile;
+    }
+
+    /**
+     * Beschriftung plus anklickbares Datum.
+     *
+     * <p>Das Datum ist ein flacher Knopf statt eines Labels: Wer eine bestehende Liste
+     * einspielt, hat vor Wochen abgeschickt — dann steht hier der Importtag, und Nachfassfrist
+     * wie Fälligkeit rechnen auf dem falschen Tag. Ein Klick genügt zum Richtigstellen.
+     */
+    private HBox datumszeile(String praefix, LocalDate datum, Consumer<LocalDate> speichern) {
+        Label label = new Label(praefix);
+        label.getStyleClass().add("status-line-text");
+
+        Button knopf = new Button(formatiere(datum));
+        knopf.getStyleClass().add("card-date-btn");
+        knopf.setTooltip(new Tooltip("Datum ändern"));
+        knopf.setOnAction(e -> {
+            e.consume();
+            frageDatum(praefix, datum, speichern);
+        });
+
+        HBox zeile = new HBox(6, label, knopf);
+        zeile.setAlignment(Pos.CENTER_LEFT);
+        return zeile;
+    }
+
+    /** Kleines Overlay mit Kalender. Es gibt sonst keinen DatePicker in der Anwendung. */
+    private void frageDatum(String titel, LocalDate vorgabe, Consumer<LocalDate> speichern) {
+        Label ueberschrift = new Label(titel);
+        ueberschrift.getStyleClass().add("overlay-title");
+
+        DatePicker kalender = new DatePicker(vorgabe != null ? vorgabe : LocalDate.now());
+        kalender.getStyleClass().add("form-input");
+        kalender.setMaxWidth(Double.MAX_VALUE);
+        kalender.setConverter(new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(LocalDate wert) {
+                return wert == null ? "" : wert.format(ErinnerungService.DATUM);
+            }
+
+            @Override
+            public LocalDate fromString(String text) {
+                if (text == null || text.isBlank()) {
+                    return null;
+                }
+                try {
+                    return LocalDate.parse(text.trim(), ErinnerungService.DATUM);
+                } catch (java.time.format.DateTimeParseException ex) {
+                    return null;
+                }
+            }
+        });
+
+        Label inlineError = new Label();
+        inlineError.getStyleClass().add("error-label");
+        inlineError.setVisible(false);
+        inlineError.setManaged(false);
+
+        Button abbrechen = new Button("Abbrechen");
+        abbrechen.getStyleClass().add("ghost-btn");
+        abbrechen.setOnAction(e -> hideFormOverlay());
+
+        Button uebernehmen = new Button("Übernehmen");
+        uebernehmen.getStyleClass().add("btn-primary");
+        uebernehmen.setOnAction(e -> {
+            LocalDate gewaehlt = kalender.getValue();
+            if (gewaehlt == null) {
+                inlineError.setText("Bitte ein Datum im Format TT.MM.JJJJ wählen.");
+                inlineError.setVisible(true);
+                inlineError.setManaged(true);
+                return;
+            }
+            hideFormOverlay();
+            speichern.accept(gewaehlt);
+        });
+
+        HBox actions = new HBox(10, abbrechen, uebernehmen);
+        actions.getStyleClass().add("admin-overlay-actions");
+
+        VBox content = new VBox(14, ueberschrift, kalender, inlineError, actions);
+        content.getStyleClass().add("admin-overlay-panel");
+        showOverlayContent(content, true);
+        Platform.runLater(kalender::requestFocus);
+    }
+
+    private void speichereStatusDatum(BewerbungseintragResponse item, String statusTitel,
+                                      LocalDate datum) {
+        AsyncRunner.run(
+                () -> bewerbungseintragService.setzeStatusDatum(
+                        item.bewerbungseintragId(), statusTitel, datum),
+                r -> loadApplications(),
+                err -> {
+                    log.error("Statusdatum konnte nicht gesetzt werden", err);
+                    showError("Das Datum konnte nicht gespeichert werden.");
+                });
+    }
+
+    /**
+     * „Entwurf seit" ist keine Verlaufszeile, sondern das Feld {@code erstelltAm} am Eintrag
+     * selbst — deshalb geht es hier über einen Patch statt über den Statusverlauf.
+     */
+    private void speichereErstelltAm(BewerbungseintragResponse item, LocalDate datum) {
+        AsyncRunner.run(
+                () -> bewerbungseintragService.setzeErstelltAm(item.bewerbungseintragId(), datum),
+                r -> loadApplications(),
+                err -> {
+                    log.error("Entwurfsdatum konnte nicht gesetzt werden", err);
+                    showError("Das Datum konnte nicht gespeichert werden.");
+                });
+    }
+
+    private HBox statusZeile(String iconLiteral, Node text, Button menue, boolean hervorheben) {
         FontIcon icon = new FontIcon(iconLiteral);
         icon.setIconSize(12);
         icon.getStyleClass().add(hervorheben ? "reminder-icon" : "status-line-icon");
@@ -1664,6 +1822,65 @@ public class DashboardController {
         return (v != null && !v.isBlank()) ? v : fallback;
     }
 
+    // =====================================================================
+    //  Zwischenablage und Systemprogramme
+    //
+    //  Die Anwendung selbst verbindet sich weiterhin nirgendwohin. Sie reicht auf Klick eine
+    //  Adresse an Browser oder Mailprogramm weiter - das ist eine Handlung des Nutzers, kein
+    //  Netzverkehr der Anwendung. Siehe SICHERHEIT.md.
+    // =====================================================================
+
+    private void inDieZwischenablage(String wert, String was) {
+        ClipboardContent inhalt = new ClipboardContent();
+        inhalt.putString(wert);
+        Clipboard.getSystemClipboard().setContent(inhalt);
+        statusBarLabel.setText(was + " kopiert.");
+    }
+
+    private void oeffneImBrowser(String url) {
+        // Wer den Link von Hand eingetragen hat, laesst das Schema gern weg.
+        String vollstaendig = url.matches("(?i)^[a-z][a-z0-9+.-]*://.*") ? url : "https://" + url;
+        oeffne(Desktop.Action.BROWSE,
+                () -> Desktop.getDesktop().browse(URI.create(vollstaendig)),
+                "Der Link konnte nicht geöffnet werden.", url, "Link");
+    }
+
+    private void oeffneMailprogramm(String adresse) {
+        oeffne(Desktop.Action.MAIL,
+                () -> Desktop.getDesktop().mail(URI.create("mailto:" + adresse)),
+                "Das Mailprogramm konnte nicht geöffnet werden.", adresse, "E-Mail-Adresse");
+    }
+
+    private void oeffne(Desktop.Action aktion, DesktopAufruf aufruf, String fehlertext,
+                        String wert, String was) {
+        if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(aktion)) {
+            // Kein Browser oder Mailprogramm ansprechbar: dann wenigstens kopieren, statt den
+            // Klick ins Leere laufen zu lassen.
+            inDieZwischenablage(wert, was);
+            return;
+        }
+        // Der Aufruf kann blockieren, bis das andere Programm oben ist - deshalb nicht auf dem
+        // FX-Thread, sonst friert das Fenster so lange ein.
+        AsyncRunner.run(
+                () -> {
+                    try {
+                        aufruf.ausfuehren();
+                    } catch (IOException | RuntimeException e) {
+                        throw new IllegalStateException(fehlertext, e);
+                    }
+                },
+                () -> { },
+                err -> {
+                    log.error(fehlertext, err);
+                    showError(fehlertext);
+                });
+    }
+
+    @FunctionalInterface
+    private interface DesktopAufruf {
+        void ausfuehren() throws IOException;
+    }
+
     void showError(String msg) {
         Platform.runLater(() -> {
             overlayPresenter.show(OverlayRequest.danger(
@@ -1784,16 +2001,26 @@ public class DashboardController {
             meta.getStyleClass().add("application-meta-row");
             String contact = nvl(item.ansprechpartner(), item.contactPerson());
             if (contact != null)                          meta.getChildren().add(metaItem("fas-user", contact));
-            if (item.email() != null && !item.email().isBlank()) meta.getChildren().add(metaItem("fas-envelope", item.email()));
+            if (item.email() != null && !item.email().isBlank()) {
+                String adresse = item.email();
+                meta.getChildren().add(metaAktion("fas-envelope", adresse,
+                        () -> oeffneMailprogramm(adresse), "E-Mail-Adresse"));
+            }
             String ort = nvl(item.location(), item.standort());
             if (ort != null)                              meta.getChildren().add(metaItem("fas-map-marker-alt", ort));
             if (!meta.getChildren().isEmpty())            card.getChildren().add(meta);
 
             HBox metaSecondary = new HBox(42); metaSecondary.setAlignment(Pos.CENTER_LEFT);
             metaSecondary.getStyleClass().add("application-meta-row");
-            if (item.url() != null && !item.url().isBlank()) metaSecondary.getChildren().add(metaItem("fas-external-link-alt", item.url()));
+            if (item.url() != null && !item.url().isBlank()) {
+                String adresse = item.url();
+                metaSecondary.getChildren().add(metaAktion("fas-external-link-alt", adresse,
+                        () -> oeffneImBrowser(adresse), "Link"));
+            }
             String phone = nvl(item.telefon(), item.phone());
-            if (phone != null) metaSecondary.getChildren().add(metaItem("fas-phone-alt", phone));
+            // Eine Telefonnummer laesst sich am Rechner nicht sinnvoll "oeffnen" - nur kopieren.
+            if (phone != null) metaSecondary.getChildren().add(metaAktion("fas-phone-alt", phone,
+                    null, "Telefonnummer"));
             if (!metaSecondary.getChildren().isEmpty()) card.getChildren().add(metaSecondary);
 
             // Zum Status passende Zeile: Datum plus - wo es etwas zu tun gibt - ein Menue.
@@ -1867,6 +2094,42 @@ public class DashboardController {
             Label l = new Label(text); l.getStyleClass().add("application-meta-item");
             HBox box = new HBox(8, ic, l); box.setAlignment(Pos.CENTER_LEFT);
             box.getStyleClass().add("application-meta-box");
+            return box;
+        }
+
+        /**
+         * Wie {@link #metaItem}, aber der Wert lässt sich benutzen statt nur lesen.
+         *
+         * <p>Bisher stand hier reiner Text: Wer einen Link öffnen wollte, musste die Karte
+         * aufklappen, den Text markieren, kopieren und im Browser einfügen — bei der E-Mail
+         * dasselbe. Jetzt öffnet ein Klick direkt, und der Knopf daneben legt den Wert in die
+         * Zwischenablage.
+         */
+        private HBox metaAktion(String icon, String text, Runnable oeffnen, String was) {
+            FontIcon ic = new FontIcon(icon); ic.setIconSize(12); ic.getStyleClass().add("meta-icon");
+
+            HBox box = new HBox(8, ic);
+            box.setAlignment(Pos.CENTER_LEFT);
+            box.getStyleClass().add("application-meta-box");
+
+            if (oeffnen != null) {
+                Hyperlink wert = new Hyperlink(text);
+                wert.getStyleClass().add("application-meta-link");
+                wert.setOnAction(e -> { e.consume(); oeffnen.run(); });
+                box.getChildren().add(wert);
+            } else {
+                Label wert = new Label(text);
+                wert.getStyleClass().add("application-meta-item");
+                box.getChildren().add(wert);
+            }
+
+            Button kopieren = new Button();
+            kopieren.getStyleClass().add("meta-copy-btn");
+            kopieren.setGraphic(new FontIcon("far-copy"));
+            kopieren.setTooltip(new Tooltip(was + " kopieren"));
+            kopieren.setOnAction(e -> { e.consume(); inDieZwischenablage(text, was); });
+            box.getChildren().add(kopieren);
+
             return box;
         }
 

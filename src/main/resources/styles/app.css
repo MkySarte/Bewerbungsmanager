@@ -111,6 +111,11 @@
 .screen-overlay > .overlay-shell-compact {
     -fx-max-width: 520;
     -fx-pref-width: 520;
+    /* Ein kleiner Dialog soll seinen Inhalt umschliessen. Ohne diese Zeile gewinnt das
+       -fx-max-height: 900 von .overlay-shell gegen setMaxHeight(USE_PREF_SIZE) im Code -
+       in JavaFX sticht das Stylesheet den Setter -, und unter einem Kalender bliebe eine
+       handbreite leere Flaeche stehen. -Infinity bedeutet hier USE_PREF_SIZE. */
+    -fx-max-height: -Infinity;
 }
 
 .overlay-header-actions {
@@ -722,6 +727,7 @@
 .stat-icon-orange { -fx-icon-color: -color-orange;  }
 .stat-icon-red    { -fx-icon-color: -color-red;     }
 .stat-icon-green  { -fx-icon-color: -color-green;   }
+.stat-icon-draft  { -fx-icon-color: -color-text-mute; }
 
 /* ── Toolbar ── */
 .toolbar {
@@ -1499,6 +1505,113 @@
 .card-inline-btn .ikonli-font-icon {
     -fx-icon-size: 9;
     -fx-icon-color: -color-text-mute;
+}
+
+/* ── Anklickbares Datum in der Statuszeile ──────────────────
+   Sieht wie Text aus und verraet erst beim Ueberfahren, dass
+   man es anfassen kann - sonst waere die Zeile ein Knopfsalat. */
+.card-date-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 6;
+    -fx-padding: 1 4 1 4;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-text-main;
+    -fx-cursor: hand;
+}
+
+.card-date-btn:hover {
+    -fx-background-color: -color-surface-hover;
+    -fx-border-color: -color-blue;
+    -fx-text-fill: -color-blue;
+}
+
+/* ── Kalender im kleinen Datums-Overlay ── */
+.date-picker {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-main;
+    -fx-font-size: 13px;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: -color-text-soft;
+}
+
+.date-picker-popup {
+    -fx-background-color: -color-surface;
+    -fx-border-color: -color-border;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.date-picker-popup > * > .day-name-cell,
+.date-picker-popup > * > .day-cell {
+    -fx-text-fill: -color-text-main;
+    -fx-background-color: -color-surface;
+}
+
+.date-picker-popup > * > .day-cell:hover {
+    -fx-background-color: -color-surface-hover;
+}
+
+.date-picker-popup > * > .selected {
+    -fx-background-color: -color-blue;
+    -fx-text-fill: -color-text-on-primary;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: -color-surface;
+}
+
+.date-picker-popup > .month-year-pane .label {
+    -fx-text-fill: -color-text-main;
+}
+
+/* ── Link und E-Mail auf der Karte: benutzbar statt nur lesbar ── */
+.application-meta-link {
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-blue;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.application-meta-link:hover {
+    -fx-underline: true;
+}
+
+.application-meta-link:visited {
+    -fx-text-fill: -color-blue;
+}
+
+.meta-copy-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 2 0 2;
+    -fx-cursor: hand;
+}
+
+.meta-copy-btn .ikonli-font-icon {
+    -fx-icon-size: 11;
+    -fx-icon-color: -color-text-mute;
+}
+
+.meta-copy-btn:hover .ikonli-font-icon {
+    -fx-icon-color: -color-blue;
 }
 
 /* Einstellungen sind länger geworden - der Dialog scrollt */

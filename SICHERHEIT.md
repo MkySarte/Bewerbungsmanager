@@ -11,6 +11,12 @@ ausgehenden Verbindungen. Damit entfällt die ganze Klasse von Risiken, die aus 
 Serveranbindung entsteht — dafür verlagert sich alles auf eine Frage: **Was passiert, wenn
 jemand an die Datei kommt?**
 
+Eine Genauigkeit dazu: Auf der Bewerbungskarte lassen sich Link und E-Mail-Adresse anklicken.
+Die Anwendung reicht die Adresse dann an den Systembrowser oder das Mailprogramm weiter — sie
+ruft sie nicht selbst ab. Es ist eine Handlung des Nutzers, kein Netzverkehr der Anwendung;
+sie selbst öffnet weiterhin keine einzige Verbindung. Wer auch das nicht möchte, benutzt
+stattdessen den Kopierknopf daneben.
+
 Ohne Verschlüsselung wäre die Antwort ernüchternd. Die Dokumente liegen als Blob in der
 Datenbank (`DocumentEntity.content`); eine gewöhnliche SQLite-Datei lässt sich mit jedem
 Standardwerkzeug öffnen und auslesen. Ein Anmeldebildschirm ändert daran nichts — er schützt
@@ -139,6 +145,7 @@ Ausgeliefert wird ausschließlich das Programm. Jede Installation legt beim erst
 eigene, leere Datenbank im Benutzerordner an.
 
 ## Wo das im Code steht
+
 
 | Was | Wo |
 |-----|-----|
