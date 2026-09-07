@@ -516,6 +516,48 @@
     -fx-text-fill: derive(-color-blue, -10%);
 }
 
+/* ── Zweispaltige Anmeldeseite ──────────────────────────────
+   Links die Markenflaeche, rechts die Karte. Ohne das stuende
+   eine 420er Karte allein in einem 1280er Fenster.          */
+.auth-split {
+    -fx-padding: 24 48 48 48;
+    -fx-spacing: 56;
+}
+
+/* Die Breitendeckelung steht im FXML, direkt neben der der Karte - so stehen
+   beide Spaltenbreiten an einer Stelle. */
+.auth-brand {
+    -fx-spacing: 14;
+}
+
+.auth-brand-title {
+    -fx-font-family: "JetBrains Mono", monospace;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-text-main;
+}
+
+/* Kurzer Strich unter dem Namen - ruhiger als eine zweite Schriftgroesse. */
+.auth-brand-rule {
+    -fx-min-width: 64;
+    -fx-max-width: 64;
+    -fx-min-height: 3;
+    -fx-max-height: 3;
+    -fx-background-color: -color-blue;
+    -fx-background-radius: 2;
+}
+
+.auth-brand-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-text-soft;
+    -fx-line-spacing: 3px;
+}
+
+.auth-feature {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-text-soft;
+}
+
 /* ============================================================
    Dashboard
    ============================================================ */

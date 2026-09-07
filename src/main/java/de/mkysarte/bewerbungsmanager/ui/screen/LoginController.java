@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 import java.util.function.Consumer;
 
@@ -29,6 +30,9 @@ import java.util.function.Consumer;
  */
 public class LoginController {
 
+    /** Unterhalb dieser Fensterbreite bleibt nur noch die Anmeldekarte stehen. */
+    private static final int MIN_BREITE_MARKE = 900;
+
     private final VaultService vaultService;
     private final Consumer<DbSession> onUnlocked;
 
@@ -37,6 +41,7 @@ public class LoginController {
     @FXML private Label errorLabel;
     @FXML private Button loginButton;
     @FXML private Label initialAccessLabel;
+    @FXML private VBox authBrand;
 
     @FXML private StackPane forgotOverlay;
     @FXML private TextField masterPasswordField;
@@ -53,6 +58,16 @@ public class LoginController {
     public void initialize() {
         initialAccessLabel.setText(InitialAccess.USERNAME + "  /  " + InitialAccess.PASSWORD);
         usernameField.requestFocus();
+
+        // Wird das Fenster schmal, weicht die Markenspalte - sonst quetscht sie die
+        // Anmeldekarte. Der Umweg ueber sceneProperty ist noetig, weil hier noch
+        // keine Szene haengt.
+        authBrand.managedProperty().bind(authBrand.visibleProperty());
+        authBrand.sceneProperty().addListener((beobachtet, alteSzene, neueSzene) -> {
+            if (neueSzene != null) {
+                authBrand.visibleProperty().bind(neueSzene.widthProperty().greaterThan(MIN_BREITE_MARKE));
+            }
+        });
     }
 
     // =====================================================================
