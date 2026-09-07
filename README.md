@@ -39,6 +39,34 @@ weiterlaufen soll; nach einstellbarer Inaktivität sperrt sie sich dort von selb
 **Markdown-Export** — die gerade angezeigte Liste als Tabelle in eine `.md`-Datei; Suche und
 Statusfilter wirken sich aus.
 
+**Markdown-Import** — dieselbe Tabelle in der Gegenrichtung: Eine ausgefüllte `.md`-Datei wird
+eingelesen und daraus werden Bewerbungen angelegt. Gedacht für eine Stellenrecherche, die
+jemand anders erledigt — auch eine KI. Dafür gibt es **„Vorlage für KI"**: eine Datei mit
+leerer Tabelle und der Anweisung, welche Spalten hineingehören.
+
+| Spalte | Beim Import |
+|--------|-------------|
+| Firma, Stelle, Ort | **Pflicht** — ohne sie wird die Zeile abgewiesen |
+| Ansprechpartner, E-Mail, Link | optional |
+| Status, Entwurf seit, Abgeschickt, Abschluss | werden übernommen, wenn gefüllt |
+| Nachfassen ab | überlesen — rechnet die Anwendung selbst aus |
+
+Damit lässt sich auch eine anderswo geführte Liste einspielen, ohne dass jede Bewerbung zum
+Entwurf von heute wird: Steht in der Datei ein Absendedatum, steht es hinterher auch auf der
+Karte, und die Nachfassfrist rechnet vom richtigen Tag. Fehlen Status und Datum, entsteht ein
+**Entwurf** — eine gefundene Stelle ist ja noch keine abgeschickte Bewerbung.
+
+Zeilen, deren Firma und Stelle es schon gibt, werden übersprungen — dieselbe Datei zweimal
+einzuspielen legt also nichts doppelt an. Eine unbrauchbare Zeile kippt nicht den ganzen
+Import, sondern steht hinterher mit ihrer Zeilennummer im Bericht.
+
+**Auf der Karte** lässt sich jedes Datum anklicken und korrigieren, auch nachträglich. Link
+und E-Mail sind bedienbar: Ein Klick öffnet den Browser beziehungsweise das Mailprogramm, der
+Knopf daneben legt den Wert in die Zwischenablage.
+
+Die Liste steht **neueste zuerst**, und die Kacheln filtern sie: Entwürfe, Abgeschickt,
+Absagen, Erfolge, Fällig — und ganz rechts Gesamt.
+
 Die Anwendung merkt sich Größe, Position und den maximierten Zustand des Fensters.
 
 ## Technik
@@ -140,6 +168,24 @@ Ergebnis unter `target/installer/`.
 **Hinweis:** `jpackage` kann nicht cross-kompilieren — jedes Paket muss auf seinem eigenen
 Betriebssystem gebaut werden. Genau dafür gibt es die CI.
 
+### Symbole
+
+Sie liegen an zwei Stellen, weil es zwei verschiedene Verbraucher gibt:
+
+| Ort | Wofür |
+|-----|-------|
+| `src/main/resources/icons/` | Klassenpfad — Fenster, Taskleiste, Infobereich (`tray.png`) |
+| `src/main/packaging/` | Baueingabe — `.ico` für Windows, `.icns` für macOS, `.png` für Linux |
+
+`src/main/packaging/icon-master-1024.png` ist die Quelle; alle übrigen Größen sind daraus
+gerechnet. `IconRessourcenTest` prüft, dass jede Datei vorhanden ist und die Kantenlänge hat,
+die ihr Name behauptet — sonst fiele ein vertippter Pfad erst beim nächsten Release auf.
+
+Die Windows-Installation trägt eine feste Upgrade-Kennung (`winUpgradeUuid` in der `pom.xml`).
+**Sie darf sich nie ändern**, sonst installiert sich eine neue Version neben die alte statt sie
+zu ersetzen. Weil v1.0.0 noch ohne diese Kennung veröffentlicht wurde, muss sie einmalig von
+Hand deinstalliert werden; ab der nächsten Version greift das Ersetzen.
+
 ## CI/CD
 
 Zwei Abläufe unter `.github/workflows/`:
@@ -151,8 +197,8 @@ eines macOS-Läufers.
 **`release.yml`** — läuft nur, wenn eine Version markiert wird:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 Dann laufen erst die Tests, danach bauen drei Läufer parallel die Installer für Windows, macOS
@@ -163,3 +209,23 @@ Versionsnummer im Installer wird dabei aus der Marke übernommen.
 Windows geschützt", macOS „Entwickler nicht verifiziert" — beides lässt sich wegklicken, wirkt
 aber unseriös. Dagegen hülfen nur kostenpflichtige Zertifikate (Windows-Code-Signing, Apple
 Developer Program).
+
+## Lizenz
+
+**[PolyForm Noncommercial License 1.0.0](LICENSE.md)**
+
+| Erlaubt | Untersagt |
+|---------|-----------|
+| benutzen, ändern, erweitern | verkaufen |
+| weitergeben, auch die geänderte Fassung | im Unternehmen produktiv einsetzen |
+| privat, in Schule, Hochschule, gemeinnütziger Arbeit | als bezahlten Dienst anbieten |
+
+Wer eine Kopie weitergibt, muss den Lizenztext und den Vermerk aus `LICENSE.md` mitgeben.
+
+**Das ist ausdrücklich keine Open-Source-Lizenz im Sinne der OSI** — die verbietet
+Einschränkungen des Einsatzzwecks, und genau eine solche steht hier drin. GitHub führt sie
+deshalb nicht als anerkannte Lizenz. Das ist so gewollt.
+
+Die Lizenz gilt für den Code dieses Projekts. Die **mitgelieferten Abhängigkeiten behalten
+ihre eigenen Lizenzen** — JavaFX steht unter GPLv2 mit Classpath-Ausnahme, Spring Boot und
+Apache PDFBox unter der Apache License 2.0; das Bündeln durch `jpackage` ist dadurch gedeckt.
