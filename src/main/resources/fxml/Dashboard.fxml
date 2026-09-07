@@ -61,6 +61,8 @@
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label text="Meine Unterlagen" styleClass="documents-panel-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="vorlageButton" text="Vorlage für KI" styleClass="ghost-btn" onAction="#handleVorlageSpeichern"/>
+                            <Button fx:id="importMarkdownButton" text="Aus Markdown importieren" styleClass="ghost-btn" onAction="#handleImportMarkdown"/>
                             <Button fx:id="exportMarkdownButton" text="Als Markdown exportieren" styleClass="ghost-btn" onAction="#handleExportMarkdown"/>
                             <Button fx:id="openDocumentsButton" text="Dokumentenansicht" styleClass="ghost-btn" onAction="#handleOpenDocuments"/>
                         </HBox>

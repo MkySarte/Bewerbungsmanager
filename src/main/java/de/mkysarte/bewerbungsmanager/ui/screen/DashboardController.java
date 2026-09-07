@@ -6,6 +6,7 @@ import de.mkysarte.bewerbungsmanager.bewerbungseintrag.service.Bewerbungseintrag
 import de.mkysarte.bewerbungsmanager.benachrichtigung.AutostartService;
 import de.mkysarte.bewerbungsmanager.benachrichtigung.TrayService;
 import de.mkysarte.bewerbungsmanager.common.InitialAccess;
+import de.mkysarte.bewerbungsmanager.common.exception.AppException;
 import de.mkysarte.bewerbungsmanager.document.entity.DocumentScope;
 import de.mkysarte.bewerbungsmanager.document.entity.DocumentType;
 import de.mkysarte.bewerbungsmanager.document.service.PdfPreviewService;
@@ -14,7 +15,9 @@ import de.mkysarte.bewerbungsmanager.einstellung.service.EinstellungService;
 import de.mkysarte.bewerbungsmanager.erinnerung.dto.Erinnerung;
 import de.mkysarte.bewerbungsmanager.erinnerung.dto.ErinnerungsIntervall;
 import de.mkysarte.bewerbungsmanager.erinnerung.service.ErinnerungService;
+import de.mkysarte.bewerbungsmanager.export.dto.ImportErgebnis;
 import de.mkysarte.bewerbungsmanager.export.service.MarkdownExportService;
+import de.mkysarte.bewerbungsmanager.export.service.MarkdownImportService;
 import de.mkysarte.bewerbungsmanager.session.CurrentUserHolder;
 import de.mkysarte.bewerbungsmanager.session.DesktopSessionService;
 import de.mkysarte.bewerbungsmanager.status.entity.StatusEntity;
@@ -85,6 +88,7 @@ public class DashboardController {
     private final EinstellungService einstellungService;
     private final TrayService trayService;
     private final MarkdownExportService markdownExportService;
+    private final MarkdownImportService markdownImportService;
 
     // Alle verfügbaren Status (für Inline-Dropdown auf den Karten)
     private List<StatusEntity> allStatuses = List.of();
@@ -1368,6 +1372,159 @@ public class DashboardController {
                     showError("Die Datei konnte nicht gespeichert werden.");
                 }
         );
+    }
+
+    /**
+     * Speichert die Vorlage, mit der sich die Bewerbungstabelle von außen befüllen lässt.
+     *
+     * <p>Gedacht zum Weiterreichen: Wer eine Stellenrecherche erledigt — ein Mensch oder eine
+     * KI —, bekommt damit die Tabelle samt Anweisung, welche Spalten Pflicht sind. Das
+     * ausgefüllte Ergebnis liest {@link #handleImportMarkdown()} wieder ein.
+     */
+    @FXML
+    public void handleVorlageSpeichern() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Vorlage speichern");
+        chooser.setInitialFileName(markdownExportService.buildVorlageFileName());
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Markdown-Dateien", "*.md"));
+        File target = chooser.showSaveDialog(statsGrid.getScene().getWindow());
+        if (target == null) {
+            return;
+        }
+
+        AsyncRunner.run(
+                () -> {
+                    try {
+                        Files.writeString(target.toPath(), markdownExportService.vorlage(),
+                                java.nio.charset.StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        throw new java.io.UncheckedIOException(e);
+                    }
+                    return null;
+                },
+                ignored -> showInfo("Vorlage gespeichert: " + target.getName()
+                        + "\n\nSie enthält die Anweisung und eine leere Tabelle. Ausgefüllt lässt "
+                        + "sie sich über \"Aus Markdown importieren\" wieder einlesen."),
+                error -> {
+                    log.error("Vorlage konnte nicht gespeichert werden", error);
+                    showError("Die Vorlage konnte nicht gespeichert werden.");
+                }
+        );
+    }
+
+    /**
+     * Liest eine Markdown-Tabelle ein und legt daraus Bewerbungen an.
+     *
+     * <p>Das Gegenstück zum Export: dieselbe Tabelle, nur in die andere Richtung. Angelegt wird
+     * alles Verwertbare; was schon da ist oder nicht taugt, steht hinterher im Bericht.
+     */
+    @FXML
+    public void handleImportMarkdown() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Bewerbungen aus Markdown einlesen");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Markdown-Dateien", "*.md"));
+        File quelle = chooser.showOpenDialog(statsGrid.getScene().getWindow());
+        if (quelle == null) {
+            return;
+        }
+
+        AsyncRunner.run(
+                () -> {
+                    try {
+                        return markdownImportService.importiere(Files.readString(
+                                quelle.toPath(), java.nio.charset.StandardCharsets.UTF_8));
+                    } catch (IOException e) {
+                        throw new java.io.UncheckedIOException(e);
+                    }
+                },
+                ergebnis -> {
+                    loadApplications();
+                    zeigeImportBericht(ergebnis);
+                },
+                error -> {
+                    // AsyncRunner reicht die Ursache in einer CompletionException herein - ohne
+                    // Auspacken bliebe die eigentliche Meldung unsichtbar.
+                    Throwable ursache = error.getCause() != null ? error.getCause() : error;
+                    log.error("Markdown-Import fehlgeschlagen", ursache);
+                    if (ursache instanceof AppException fachlich) {
+                        showError(fachlich.getMessage());
+                    } else {
+                        showError("Die Datei konnte nicht gelesen werden.");
+                    }
+                }
+        );
+    }
+
+    /**
+     * Meldet, was der Import bewirkt hat.
+     *
+     * <p>Ging alles glatt, genügt ein Satz. Gab es Übersprungene oder unbrauchbare Zeilen,
+     * werden sie einzeln aufgeführt — eine bloße Zahl ließe den Nutzer raten, welche Zeile
+     * gemeint ist.
+     */
+    private void zeigeImportBericht(ImportErgebnis ergebnis) {
+        String kopf = ergebnis.angelegt() == 1
+                ? "1 Bewerbung angelegt."
+                : ergebnis.angelegt() + " Bewerbungen angelegt.";
+
+        if (ergebnis.ohneBeanstandung()) {
+            showInfo(kopf);
+            return;
+        }
+
+        Label title = new Label("Import abgeschlossen");
+        title.getStyleClass().add("overlay-title");
+
+        StringBuilder zusammenfassung = new StringBuilder(kopf);
+        if (!ergebnis.uebersprungen().isEmpty()) {
+            zusammenfassung.append("  ").append(ergebnis.uebersprungen().size())
+                    .append(" übersprungen.");
+        }
+        if (!ergebnis.hinweise().isEmpty()) {
+            zusammenfassung.append("  ").append(ergebnis.hinweise().size())
+                    .append(ergebnis.hinweise().size() == 1 ? " Zeile" : " Zeilen")
+                    .append(" nicht verwertbar.");
+        }
+        Label subtitle = new Label(zusammenfassung.toString());
+        subtitle.getStyleClass().add("overlay-subtitle");
+        subtitle.setWrapText(true);
+
+        VBox content = new VBox(18, title, subtitle);
+        content.getStyleClass().add("admin-overlay-panel");
+        zeilenblock(content, "Übersprungen — Firma und Stelle gibt es bereits",
+                ergebnis.uebersprungen());
+        zeilenblock(content, "Nicht verwertbar", ergebnis.hinweise());
+
+        Button schliessen = new Button("Verstanden");
+        schliessen.getStyleClass().add("btn-primary");
+        schliessen.setOnAction(e -> hideFormOverlay());
+        HBox actions = new HBox(10, schliessen);
+        actions.getStyleClass().add("admin-overlay-actions");
+        content.getChildren().add(actions);
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.getStyleClass().add("settings-scroll");
+        scroll.maxHeightProperty().bind(formOverlay.heightProperty().multiply(0.85));
+        showOverlayContent(scroll, true);
+    }
+
+    /** Eine überschriebene Liste von Meldungen; bei leerer Liste passiert nichts. */
+    private void zeilenblock(VBox ziel, String ueberschrift, List<String> meldungen) {
+        if (meldungen.isEmpty()) {
+            return;
+        }
+        VBox block = new VBox(4);
+        Label kopf = new Label(ueberschrift);
+        kopf.getStyleClass().add("form-label");
+        block.getChildren().add(kopf);
+        for (String meldung : meldungen) {
+            Label zeile = new Label(meldung);
+            zeile.getStyleClass().add("form-hint");
+            zeile.setWrapText(true);
+            block.getChildren().add(zeile);
+        }
+        ziel.getChildren().add(block);
     }
 
     /**
