@@ -1,2 +1,7 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Bilddateien nie normalisieren - unabhaengig von core.autocrlf
+*.png  binary
+*.ico  binary
+*.icns binary

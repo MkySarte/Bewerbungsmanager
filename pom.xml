@@ -202,6 +202,15 @@
                     <name>Bewerbungsmanager</name>
                     <appVersion>${project.version}</appVersion>
                     <vendor>mkysarte</vendor>
+                    <!-- Erscheint in den Dateieigenschaften und unter "Apps und Features".
+                         Ohne diese Angaben steht dort nur der nackte Name. -->
+                    <description>${project.description}</description>
+                    <copyright>(c) 2026 mkysarte</copyright>
+                    <aboutUrl>https://github.com/MkySarte/Bewerbungsmanager</aboutUrl>
+                    <!-- Wird beim Einrichten angezeigt. Der Pfad ist absolut, weil jpackage
+                         aus target/ heraus arbeitet und die CI vor dem Bauen versions:set
+                         auf diese Datei laufen laesst. -->
+                    <licenseFile>${project.basedir}/LICENSE.md</licenseFile>
                     <destination>${project.build.directory}/installer</destination>
                     <input>${project.build.directory}/libs</input>
                     <mainJar>${project.build.finalName}.jar</mainJar>
@@ -233,6 +242,11 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>EXE</type>
+                            <icon>${project.basedir}/src/main/packaging/bewerbungsmanager.ico</icon>
+                            <!-- Diese Kennung darf sich NIE mehr aendern. Ohne sie erzeugt
+                                 jpackage bei jedem Bau eine neue, und eine neue Version
+                                 installiert sich neben die alte statt sie zu ersetzen. -->
+                            <winUpgradeUuid>554e91ea-939b-493c-8933-1c33ea59ce05</winUpgradeUuid>
                             <winDirChooser>true</winDirChooser>
                             <winMenu>true</winMenu>
                             <winShortcut>true</winShortcut>
@@ -252,6 +266,7 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>DMG</type>
+                            <icon>${project.basedir}/src/main/packaging/bewerbungsmanager.icns</icon>
                             <macPackageIdentifier>de.mkysarte.bewerbungsmanager</macPackageIdentifier>
                             <macPackageName>Bewerbungsmanager</macPackageName>
                         </configuration>
@@ -269,6 +284,11 @@
                         <artifactId>jpackage-maven-plugin</artifactId>
                         <configuration>
                             <type>DEB</type>
+                            <icon>${project.basedir}/src/main/packaging/bewerbungsmanager.png</icon>
+                            <!-- Debian verlangt eine Betreueradresse; ohne sie steht ein
+                                 Platzhalter im Paket. Die noreply-Adresse von GitHub, damit
+                                 keine private Anschrift in jedem .deb landet. -->
+                            <linuxDebMaintainer>MkySarte@users.noreply.github.com</linuxDebMaintainer>
                             <linuxShortcut>true</linuxShortcut>
                             <linuxMenuGroup>Office</linuxMenuGroup>
                         </configuration>

@@ -26,13 +26,17 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Optional;
 
@@ -51,6 +55,8 @@ import java.util.Optional;
  * <p>Local-First: kein HTTP-Server, keine ausgehenden Verbindungen.
  */
 public class BewerbungsmanagerApp extends Application implements AppShell {
+
+    private static final Logger log = LoggerFactory.getLogger(BewerbungsmanagerApp.class);
 
     private static final int WINDOW_WIDTH = 1280;
     private static final int WINDOW_HEIGHT = 860;
@@ -79,6 +85,7 @@ public class BewerbungsmanagerApp extends Application implements AppShell {
         this.vaultService = new VaultService(AppPaths.dataDirectory());
 
         stage.setTitle("Bewerbungsmanager");
+        fensterSymboleLaden(stage);
         stage.setMinWidth(1100);
         stage.setMinHeight(760);
         stage.setOnCloseRequest(event -> {
@@ -104,6 +111,32 @@ public class BewerbungsmanagerApp extends Application implements AppShell {
             }
         } else {
             stage.show();
+        }
+    }
+
+    /**
+     * Legt das Anwendungssymbol in mehreren Größen ans Fenster.
+     *
+     * <p>Mehrere, weil das Betriebssystem sich selbst bedient: Windows nimmt für die Titelleiste
+     * eine andere Größe als für die Taskleiste, und Herunterskalieren aus der 256er sieht
+     * schlechter aus als eine eigens gerechnete 16er.
+     *
+     * <p>Im Installer setzt jpackage das Symbol ohnehin; hierauf angewiesen sind der
+     * Entwicklungsstart und die Fensterverwaltungen unter Linux. Ein fehlendes Symbol ist
+     * deshalb kein Grund, den Start abzubrechen.
+     */
+    private void fensterSymboleLaden(Stage stage) {
+        for (int groesse : new int[]{16, 32, 48, 64, 128, 256}) {
+            String pfad = "/icons/icon-" + groesse + ".png";
+            try (InputStream in = getClass().getResourceAsStream(pfad)) {
+                if (in == null) {
+                    log.debug("Anwendungssymbol {} nicht gefunden", pfad);
+                    continue;
+                }
+                stage.getIcons().add(new Image(in));
+            } catch (IOException | RuntimeException e) {
+                log.debug("Anwendungssymbol {} nicht lesbar", pfad, e);
+            }
         }
     }
 
